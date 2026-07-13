@@ -1,0 +1,279 @@
+// ============================================================
+// i18n.js
+// ============================================================
+// Ansvar: enbart textinnehåll för UI-chrome (knappar, labels,
+// meddelanden, modaler) på svenska och engelska.
+//
+// Händelsekortens texter (noirEvents) ligger INTE här — de hör
+// hemma i events.js eftersom de är spelregelinnehåll, inte
+// generisk UI-text.
+//
+// Inga DOM-anrop i denna fil. ui.js ansvarar för att applicera
+// översatt text på skärmen.
+// ============================================================
+
+import { getState, setLanguage as setStateLanguage, subscribe } from './state.js';
+
+export const i18n = {
+    sv: {
+        // --- Startskärm ---
+        welcomeSubtitle: "Kontrollrum",
+        welcomePrompt: "Välj vilken enhet du vill spela på ikväll:",
+        modeIpad: "💻 iPad (Liggande Bräde)",
+        modeIphone: "📱 iPhone (Stående Flikar)",
+        choosePlayerCount: "Hur många spelare?",
+        playerCount2: "2 Spelare",
+        playerCount3: "3 Spelare",
+        playerCount4: "4 Spelare",
+
+        // --- Färger / gäng ---
+        suitSpades: "Spader",
+        suitHearts: "Hjärter",
+        suitClovers: "Klöver",
+        suitDiamonds: "Ruter",
+
+        // --- Statistik ---
+        statPocket: "💼 Fickan",
+        statVault: "🔒 Kista (Säkrat)",
+        statCityBank: "🏛️ Stadens kassa",
+
+        // --- Riktning (NYTT) ---
+        directionToKing: "🚚 På väg till Kung",
+        directionToAce: "🏦 På väg till Ess (bär last)",
+
+        // --- Turordning / HUD (NYTT) ---
+        yourTurn: "DIN TUR",
+        waitingForPlayer: "Väntar på {name}...",
+        btnNextPlayer: "✅ Avsluta drag / Nästa spelare",
+        turnStepMove: "1. Flytta din pjäs",
+        turnStepAction: "2. Utför ev. handling",
+        turnStepEnd: "3. Klart? Tryck Nästa spelare",
+
+        // --- Ekonomiknappar ---
+        actGetCargo: "Hämta last ($1000)",
+        actDropCargo: "Lämna last i kistan",
+        actArrest: "Haffad",
+        actFight: "Slagsmål",
+        actPay: "Överför pengar ➔",
+
+        // --- Tärning ---
+        diceClick: "KLICKA FÖR ATT SLÅ",
+        diceRolling: "RULLAR...",
+        diceSlog: "SLOG: ",
+
+        // --- Tärning 5/6-val (NYTT) ---
+        copChoiceTitle: "Du slog en {roll}:a!",
+        copChoice5Desc: "Du går 4 steg. Välj sedan vad du vill göra med din polis:",
+        copChoice6Desc: "Du går 4 steg. Välj sedan vad du vill göra med din polis:",
+        copChoiceMove1: "👮 Flytta knekt 1 steg",
+        copChoiceMove1Event: "👮 Flytta knekt 1 steg + dra händelsekort",
+        copChoiceMove2: "👮 Flytta knekt 2 steg",
+        copChoiceConfirm: "Bekräfta val",
+
+        // --- Efter knektflytt: landade på motståndare? (NYTT) ---
+        copLandedTitle: "Landade din knekt på en motståndare?",
+        copLandedDesc: "Om din polis landade på en motståndares pjäs blir denne haffad direkt.",
+        copLandedYes: "Ja, haffa spelaren",
+        copLandedNo: "Nej, gå vidare",
+
+        // --- Knappar allmänt ---
+        btnRules: "📜 Regler",
+        btnAdjust: "🛠️ Justera",
+        btnReset: "Återställ",
+        btnOk: "Uppfattat",
+        btnCancel: "Avbryt",
+        btnConfirm: "Bekräfta",
+
+        // --- Betalning ---
+        payHeader: "Skicka pengar",
+        payRecipient: "Mottagare",
+        paySum: "Belopp ($)",
+        payPayer: " betalar",
+
+        // --- Polis / arrestering ---
+        policeTitle: "Vem gjorde gripandet?",
+        policeSubtitle: "Pengarna tillfaller polisens gäng (eller stadens kassa om ingen äger färgen).",
+
+        // --- Slagsmål ---
+        fightTitle: "Gatuslagsmål!",
+        fightPrompt: "Välj vilken motståndare som står på rutan och ska attackeras:",
+        fightAttacker: "Anfallare",
+        fightDefender: "Försvarare",
+        fightRolling: "RULLAR KNOGJÄRNEN...",
+        fightClose: "Avsluta duell",
+        fightChallenge: "🥊 Utmana ",
+
+        // --- Meddelanden ---
+        alertWinner: "BOSS! {name} kontrollerar staden med 3 säkrade kistor!",
+        alertNoCargoToDrop: "Du bär ingen last att lämna!",
+        alertAlreadyCarrying: "Du bär redan en last — lämna den på Esset först!",
+        alertCityBankEmpty: "Stadens kassa är tom just nu!",
+        alertArrested: "{victim} haffad av {cop}! Beslagtog ${loot}.",
+        alertJail: "{victim} skickas till häktet.",
+        alertBankrupt: "Fickan räcker inte! Fickan laddas om till $20 — din last (om du bär en) påverkas inte.",
+        alertReset: "Vill du nollställa spelet?",
+        alertSkipTurn: "{name} landade på en Dam och står över nästa runda!",
+        alertMustEndTurn: "Endast {name} kan agera just nu — det är deras tur.",
+
+        // --- Slagsmålslogg ---
+        fightLogDrawBankrupt: "OAVGJORT! Men anfallaren {loser} har inte råd att betala skadan. Fickan laddas om till $20.",
+        fightLogWinnerBankrupt: "VINNARE: {winner}! Förloraren {loser} har inte råd att betala. Fickan laddas om till $20.",
+        fightLogDraw: "OAVGJORT! {winner} försvarade rutan! Tar $10 och skickar bort anfallaren.",
+        fightLogWinner: "VINNARE: {winner}! Tar $10 från förloraren.",
+
+        // --- Händelsekort (chrome) ---
+        eventNotice: "⚠️ Utför händelsen först — flytta pjäsen sen!",
+        eventBadge: "SLOG EN {roll}:A 🎲",
+
+        // --- Justera-modal ---
+        modTitle: "Justera spelarvärden",
+        modLblPlayer: "Välj syndikat",
+        modLblPocket: "💼 Fickan",
+        modLblVault: "🔒 Kista",
+        modLblCityBank: "🏛️ Stadens kassa"
+    },
+
+    en: {
+        welcomeSubtitle: "Control Room",
+        welcomePrompt: "Choose which device you are playing on tonight:",
+        modeIpad: "💻 iPad (Landscape Board)",
+        modeIphone: "📱 iPhone (Portrait Tabs)",
+        choosePlayerCount: "How many players?",
+        playerCount2: "2 Players",
+        playerCount3: "3 Players",
+        playerCount4: "4 Players",
+
+        suitSpades: "Spades",
+        suitHearts: "Hearts",
+        suitClovers: "Clubs",
+        suitDiamonds: "Diamonds",
+
+        statPocket: "💼 Pocket",
+        statVault: "🔒 Vault (Secured)",
+        statCityBank: "🏛️ City Treasury",
+
+        directionToKing: "🚚 Heading to King",
+        directionToAce: "🏦 Heading to Ace (carrying cargo)",
+
+        yourTurn: "YOUR TURN",
+        waitingForPlayer: "Waiting for {name}...",
+        btnNextPlayer: "✅ End Turn / Next Player",
+        turnStepMove: "1. Move your token",
+        turnStepAction: "2. Resolve any action",
+        turnStepEnd: "3. Done? Tap Next Player",
+
+        actGetCargo: "Pick Up Cargo ($1000)",
+        actDropCargo: "Drop Cargo in Vault",
+        actArrest: "Busted",
+        actFight: "Street Fight",
+        actPay: "Transfer Cash ➔",
+
+        diceClick: "CLICK TO ROLL",
+        diceRolling: "ROLLING...",
+        diceSlog: "ROLLED: ",
+
+        copChoiceTitle: "You rolled a {roll}!",
+        copChoice5Desc: "You move 4 steps. Then choose what to do with your cop:",
+        copChoice6Desc: "You move 4 steps. Then choose what to do with your cop:",
+        copChoiceMove1: "👮 Move cop 1 step",
+        copChoiceMove1Event: "👮 Move cop 1 step + draw event card",
+        copChoiceMove2: "👮 Move cop 2 steps",
+        copChoiceConfirm: "Confirm choice",
+
+        copLandedTitle: "Did your cop land on an opponent?",
+        copLandedDesc: "If your cop landed on an opponent's token, they are busted immediately.",
+        copLandedYes: "Yes, bust the player",
+        copLandedNo: "No, continue",
+
+        btnRules: "📜 Rules",
+        btnAdjust: "🛠️ Adjust",
+        btnReset: "Reset",
+        btnOk: "Understood",
+        btnCancel: "Cancel",
+        btnConfirm: "Confirm",
+
+        payHeader: "Send Money",
+        payRecipient: "Recipient",
+        paySum: "Amount ($)",
+        payPayer: " pays",
+
+        policeTitle: "Who made the arrest?",
+        policeSubtitle: "The money goes to the cop's syndicate (or city treasury if no one owns that color).",
+
+        fightTitle: "Street Fight!",
+        fightPrompt: "Select the opponent occupying the square to attack:",
+        fightAttacker: "Attacker",
+        fightDefender: "Defender",
+        fightRolling: "ROLLING KNUCKLES...",
+        fightClose: "End Duel",
+        fightChallenge: "🥊 Challenge ",
+
+        alertWinner: "BOSS! {name} controls the city with 3 secured vaults!",
+        alertNoCargoToDrop: "You aren't carrying any cargo to drop!",
+        alertAlreadyCarrying: "You're already carrying cargo — drop it at your Ace first!",
+        alertCityBankEmpty: "The city treasury is empty right now!",
+        alertArrested: "{victim} busted by {cop}! Confiscated ${loot}.",
+        alertJail: "{victim} sent to local precinct.",
+        alertBankrupt: "Pocket cash ran out! Pocket refilled to $20 — your cargo (if any) is unaffected.",
+        alertReset: "Reset the game?",
+        alertSkipTurn: "{name} landed on a Queen and skips the next round!",
+        alertMustEndTurn: "Only {name} can act right now — it's their turn.",
+
+        fightLogDrawBankrupt: "DRAW! But attacker {loser} can't afford the damage. Pocket refilled to $20.",
+        fightLogWinnerBankrupt: "WINNER: {winner}! Loser {loser} can't afford to pay. Pocket refilled to $20.",
+        fightLogDraw: "DRAW! {winner} defended the block! Takes $10 and expels the attacker.",
+        fightLogWinner: "WINNER: {winner}! Takes $10 from the loser.",
+
+        eventNotice: "⚠️ Execute the event first — move your piece after!",
+        eventBadge: "ROLLED A {roll} 🎲",
+
+        modTitle: "Adjust Player Values",
+        modLblPlayer: "Select Syndicate",
+        modLblPocket: "💼 Pocket",
+        modLblVault: "🔒 Vault",
+        modLblCityBank: "🏛️ City Treasury"
+    }
+};
+
+// Namn per gäng/färg — hålls här eftersom de visas i UI-text
+// (t.ex. "Nightspades betalar"). Byt fritt utan att påverka logik.
+export const gangNames = {
+    1: { sv: "♠ Nightspades", en: "♠ Nightspades" },
+    2: { sv: "♥ Crimson", en: "♥ Crimson" },
+    3: { sv: "♣ Iron Clovers", en: "♣ Iron Clovers" },
+    4: { sv: "♦ Diamond", en: "♦ Diamond" }
+};
+
+// ---- Hjälpfunktioner ----
+
+// Hämtar en textsträng för aktuellt språk (state.language).
+export function t(key) {
+    const lang = getState().language;
+    return i18n[lang][key] ?? `[[${key}]]`;
+}
+
+// Ersätter {placeholders} i en textsträng, t.ex.
+// interpolate(t('alertArrested'), { victim: 'X', cop: 'Y', loot: 50 })
+export function interpolate(template, params = {}) {
+    return Object.keys(params).reduce(
+        (str, key) => str.replaceAll(`{${key}}`, params[key]),
+        template
+    );
+}
+
+export function gangName(playerId) {
+    const lang = getState().language;
+    return gangNames[playerId][lang];
+}
+
+// Byter språk i state. ui.js lyssnar via subscribe() i state.js
+// och ansvarar för att applicera texten på DOM när detta anropas.
+export function changeLanguage(lang) {
+    setStateLanguage(lang);
+}
+
+// Låter andra moduler prenumerera på språkbyten specifikt om de vill,
+// utan att behöva importera hela state.js-prenumerationslistan.
+export function onLanguageChange(callback) {
+    subscribe((state) => callback(state.language));
+}
