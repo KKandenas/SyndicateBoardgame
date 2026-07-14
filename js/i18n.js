@@ -51,6 +51,7 @@ export const i18n = {
 
         // --- Ekonomiknappar ---
         actGetCargo: "Hämta last ($1000)",
+        actRefillPocket: "Ladda om ficka ($20)",
         actDropCargo: "Lämna last i kistan",
         actArrest: "Haffad",
         actFight: "Slagsmål",
@@ -163,6 +164,7 @@ export const i18n = {
         turnStepEnd: "3. Done? Tap Next Player",
 
         actGetCargo: "Pick Up Cargo ($1000)",
+        actRefillPocket: "Refill Pocket ($20)",
         actDropCargo: "Drop Cargo in Vault",
         actArrest: "Busted",
         actFight: "Street Fight",
