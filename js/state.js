@@ -16,6 +16,11 @@ export const CARGO_VALUE = 1000;      // Värdet på en skattkista
 export const WINNING_VAULT = 3000;    // 3 kistor = vinst
 export const CITY_BANK_START = 100000; // Praktiskt oändligt "startkapital" för staden
 
+// Turordning runt det fysiska brädet, medurs: Nightspades -> Diamond ->
+// Crimson -> Iron Clovers. Detta styr BÅDE vilka spelar-id:n som blir
+// aktiva vid 2-3 spelare, OCH i vilken ordning turen går.
+export const BOARD_ORDER = [1, 4, 2, 3];
+
 export const SUITS = {
     1: 'spades',
     2: 'hearts',
@@ -100,7 +105,7 @@ export function setupPlayerCount(count) {
     if (count < 2 || count > 4) {
         throw new Error('Antal spelare måste vara 2-4');
     }
-    const activeIds = [1, 2, 3, 4].slice(0, count);
+    const activeIds = BOARD_ORDER.slice(0, count);
     for (let id = 1; id <= 4; id++) {
         state.players[id].active = activeIds.includes(id);
     }
