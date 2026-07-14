@@ -64,12 +64,14 @@ export const i18n = {
 
         // --- Tärning 5/6-val (NYTT) ---
         copChoiceTitle: "Du slog en {roll}:a!",
-        copChoice5Desc: "Du går 4 steg. Välj sedan vad du vill göra med din polis:",
-        copChoice6Desc: "Du går 4 steg. Välj sedan vad du vill göra med din polis:",
+        copChoice5Desc: "Du har två val: ① Flytta din knekt 1 steg, ELLER ② Dra ett händelsekort. Gör ditt val — sedan flyttar du din egen pjäs 4 steg.",
+        copChoice6Desc: "Du har två val: ① Flytta din knekt 1 steg OCH dra ett händelsekort, ELLER ② Flytta din knekt 2 steg. Gör ditt val — sedan flyttar du din egen pjäs 4 steg.",
         copChoiceMove1: "👮 Flytta knekt 1 steg",
         copChoiceMove1Event: "👮 Flytta knekt 1 steg + dra händelsekort",
         copChoiceMove2: "👮 Flytta knekt 2 steg",
         copChoiceConfirm: "Bekräfta val",
+        moveCopNow: "Flytta din knekt {steps} steg",
+        moveTokenNow: "Flytta nu din pjäs {steps} steg",
 
         // --- Efter knektflytt: landade på motståndare? (NYTT) ---
         copLandedTitle: "Landade din knekt på en motståndare?",
@@ -92,8 +94,8 @@ export const i18n = {
         payPayer: " betalar",
 
         // --- Polis / arrestering ---
-        policeTitle: "Vem gjorde gripandet?",
-        policeSubtitle: "Pengarna tillfaller polisens gäng (eller stadens kassa om ingen äger färgen).",
+        policeTitle: "Vem blev gripen?",
+        policeSubtitle: "Fickpengarna tillfaller din egen ficka. Den gripne går tillbaka till sitt Ess.",
 
         // --- Slagsmål ---
         fightTitle: "Gatuslagsmål!",
@@ -109,8 +111,8 @@ export const i18n = {
         alertNoCargoToDrop: "Du bär ingen last att lämna!",
         alertAlreadyCarrying: "Du bär redan en last — lämna den på Esset först!",
         alertCityBankEmpty: "Stadens kassa är tom just nu!",
-        alertArrested: "{victim} haffad av {cop}! Beslagtog ${loot}.",
-        alertJail: "{victim} skickas till häktet.",
+        alertArrested: "{victim} greps av {cop}! Beslagtog ${loot}. {victim} går tillbaka till sitt Ess med $20 i fickan.",
+        alertJail: "{victim} greps, men hade inget extra att beslagta. Går tillbaka till sitt Ess.",
         alertBankrupt: "Fickan räcker inte! Fickan laddas om till $20 — din last (om du bär en) påverkas inte.",
         alertReset: "Vill du nollställa spelet?",
         alertSkipTurn: "{name} landade på en Dam och står över nästa runda!",
@@ -175,12 +177,14 @@ export const i18n = {
         diceSlog: "ROLLED: ",
 
         copChoiceTitle: "You rolled a {roll}!",
-        copChoice5Desc: "You move 4 steps. Then choose what to do with your cop:",
-        copChoice6Desc: "You move 4 steps. Then choose what to do with your cop:",
+        copChoice5Desc: "You have two choices: ① Move your cop 1 step, OR ② Draw an event card. Make your choice — then move your own token 4 steps.",
+        copChoice6Desc: "You have two choices: ① Move your cop 1 step AND draw an event card, OR ② Move your cop 2 steps. Make your choice — then move your own token 4 steps.",
         copChoiceMove1: "👮 Move cop 1 step",
         copChoiceMove1Event: "👮 Move cop 1 step + draw event card",
         copChoiceMove2: "👮 Move cop 2 steps",
         copChoiceConfirm: "Confirm choice",
+        moveCopNow: "Move your cop {steps} step(s)",
+        moveTokenNow: "Now move your token {steps} steps",
 
         copLandedTitle: "Did your cop land on an opponent?",
         copLandedDesc: "If your cop landed on an opponent's token, they are busted immediately.",
@@ -199,8 +203,8 @@ export const i18n = {
         paySum: "Amount ($)",
         payPayer: " pays",
 
-        policeTitle: "Who made the arrest?",
-        policeSubtitle: "The money goes to the cop's syndicate (or city treasury if no one owns that color).",
+        policeTitle: "Who got caught?",
+        policeSubtitle: "The pocket cash goes to your own pocket. The one caught returns to their Ace.",
 
         fightTitle: "Street Fight!",
         fightPrompt: "Select the opponent occupying the square to attack:",
@@ -214,8 +218,8 @@ export const i18n = {
         alertNoCargoToDrop: "You aren't carrying any cargo to drop!",
         alertAlreadyCarrying: "You're already carrying cargo — drop it at your Ace first!",
         alertCityBankEmpty: "The city treasury is empty right now!",
-        alertArrested: "{victim} busted by {cop}! Confiscated ${loot}.",
-        alertJail: "{victim} sent to local precinct.",
+        alertArrested: "{victim} busted by {cop}! Confiscated ${loot}. {victim} returns to their Ace with $20 pocket cash.",
+        alertJail: "{victim} busted, but had nothing extra to confiscate. Returns to their Ace.",
         alertBankrupt: "Pocket cash ran out! Pocket refilled to $20 — your cargo (if any) is unaffected.",
         alertReset: "Reset the game?",
         alertSkipTurn: "{name} landed on a Queen and skips the next round!",
