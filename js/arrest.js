@@ -23,7 +23,7 @@
 // vid bordet.
 // ============================================================
 
-import { getPlayer, mutatePlayer, mutateCityBank, START_POCKET } from './state.js';
+import { getPlayer, mutatePlayer, START_POCKET } from './state.js';
 import { assertCanAct } from './turnOrder.js';
 
 export const ArrestResult = {
@@ -34,14 +34,20 @@ export const ArrestResult = {
 // Generellt arresteringsflöde. actingPlayerId måste vara den aktiva
 // spelaren (skyddar mot fel-tur-anrop). victimId och copOwnerId väljs
 // i UI:ts modal.
+//
+// ÄNDRAT (playtest-beslut): beslagtagna pengar går till den GRIPANDE
+// SPELARENS egen ficka, inte längre till stadsbanken. Offret skickas
+// tillbaka till sitt Ess (fysiskt, hanteras av spelarna vid bordet)
+// med fickan återställd till $20.
 export function executeArrest(actingPlayerId, victimId, copOwnerId) {
     assertCanAct(actingPlayerId);
 
     const victim = getPlayer(victimId);
+    const copOwner = getPlayer(copOwnerId);
 
     if (victim.pocket > START_POCKET) {
         const loot = victim.pocket - START_POCKET;
-        mutateCityBank(loot);
+        mutatePlayer(copOwnerId, { pocket: copOwner.pocket + loot });
         mutatePlayer(victimId, { pocket: START_POCKET });
         return { result: ArrestResult.LOOTED, loot, victimId, copOwnerId };
     }
