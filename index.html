@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Noir Syndicate v2</title>
+    <link class="apple-touch-icon" href="gangsters.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="background-container"></div>
+    <div class="overlay-container"></div>
+
+    <!-- Toasts (ersätter alert()) -->
+    <div id="toast-container"></div>
+
+    <!-- Språkväljare, alltid synlig -->
+    <div class="live-lang-selector">
+        <button class="btn-lang active" id="live-lang-sv" onclick="window.NoirUI.setLanguage('sv')">SV</button>
+        <button class="btn-lang" id="live-lang-en" onclick="window.NoirUI.setLanguage('en')">EN</button>
+    </div>
+
+    <!-- NYTT v2: Turordnings-HUD + Stadsbank-HUD -->
+    <div id="turn-banner"></div>
+    <div id="city-bank-hud">
+        <div style="font-size:9px; opacity:0.7;" data-key="statCityBank">🏛️ Stadens kassa</div>
+        <div id="city-bank-value">$0</div>
+    </div>
+    <button id="btn-next-player" onclick="window.NoirUI.nextPlayer()" data-key="btnNextPlayer">✅ Nästa spelare</button>
+
+    <!-- Startskärm -->
+    <div class="welcome-screen" id="welcome-screen">
+        <div class="welcome-title">THE NOIR SYNDICATE</div>
+        <div class="welcome-subtitle" data-key="welcomeSubtitle">Kontrollrum</div>
+        <div class="welcome-card">
+            <div class="lang-toggle-container">
+                <button class="btn-lang active" id="welcome-lang-sv" onclick="window.NoirUI.setLanguage('sv')">Svenska</button>
+                <button class="btn-lang" id="welcome-lang-en" onclick="window.NoirUI.setLanguage('en')">English</button>
+            </div>
+            <p style="font-size:13px; color:#aaa; margin-bottom:15px;" data-key="welcomePrompt">Välj vilken enhet du vill spela på ikväll:</p>
+            <div class="device-selector">
+                <button class="btn-device" id="btn-mode-ipad" onclick="window.NoirUI.startGame('ipad')" data-key="modeIpad">💻 iPad (Liggande Bräde)</button>
+                <button class="btn-device" id="btn-mode-iphone" onclick="window.NoirUI.startGame('iphone')" data-key="modeIphone">📱 iPhone (Stående Flikar)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NYTT v2: Antal spelare-modal (visas efter enhetsval) -->
+    <div class="overlay" id="player-count-overlay">
+        <div class="popup">
+            <div class="popup-title" style="color:#ecc94b;" data-key="choosePlayerCount">Hur många spelare?</div>
+            <div class="player-count-selector">
+                <button class="btn-device" onclick="window.NoirUI.choosePlayerCount(2)" data-key="playerCount2">2 Spelare</button>
+                <button class="btn-device" onclick="window.NoirUI.choosePlayerCount(3)" data-key="playerCount3">3 Spelare</button>
+                <button class="btn-device" onclick="window.NoirUI.choosePlayerCount(4)" data-key="playerCount4">4 Spelare</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-container">
+
+        <!-- Spelare 1: Spader -->
+        <div class="player-corner active-tab" id="p1">
+            <div class="gang-header">
+                <div class="gang-title" id="p1-gang-title">♠ Nightspades</div>
+                <div class="deck-suit suit-black" data-key="suitSpades">Spader</div>
+            </div>
+            <div class="direction-badge" id="p1-direction-badge"></div>
+            <div class="stats-grid">
+                <div class="stat-box pocket-box">
+                    <div class="stat-label" data-key="statPocket">💼 Fickan</div>
+                    <div class="stat-value" id="p1-pocket">$20</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label" data-key="statVault">🔒 Kista</div>
+                    <div class="stat-value" id="p1-vault" style="color:var(--spades-color)">$0</div>
+                </div>
+            </div>
+            <div class="gang-actions">
+                <button id="p1-btn-get-cargo" class="btn-success btn-cargo-action" onclick="window.NoirUI.handleGetCargo(1)">💰 <span data-key="actGetCargo">Hämta last</span></button>
+                <button id="p1-btn-refill" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleRefillPocket(1)">🔄 <span data-key="actRefillPocket">Ladda om ficka</span></button>
+                <button id="p1-btn-drop-cargo" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleDropCargo(1)">👑 <span data-key="actDropCargo">Lämna last</span></button>
+                <button onclick="window.NoirUI.openManualArrestModal(1)" class="btn-danger">🚨 <span data-key="actArrest">Haffad</span></button>
+                <button onclick="window.NoirUI.openFightModal(1)" class="btn-fight">💥 <span data-key="actFight">Slagsmål</span></button>
+                <button onclick="window.NoirUI.openPayModal(1)" class="btn-pay">💸 <span data-key="actPay">Överför pengar ➔</span></button>
+            </div>
+        </div>
+
+        <!-- Spelare 4: Ruter -->
+        <div class="player-corner" id="p4">
+            <div class="gang-header">
+                <div class="gang-title" id="p4-gang-title">♦ Diamond</div>
+                <div class="deck-suit suit-red" data-key="suitDiamonds">Ruter</div>
+            </div>
+            <div class="direction-badge" id="p4-direction-badge"></div>
+            <div class="stats-grid">
+                <div class="stat-box pocket-box">
+                    <div class="stat-label" data-key="statPocket">💼 Fickan</div>
+                    <div class="stat-value" id="p4-pocket">$20</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label" data-key="statVault">🔒 Kista</div>
+                    <div class="stat-value" id="p4-vault" style="color:var(--diamonds-color)">$0</div>
+                </div>
+            </div>
+            <div class="gang-actions">
+                <button id="p4-btn-get-cargo" class="btn-success btn-cargo-action" onclick="window.NoirUI.handleGetCargo(4)">💰 <span data-key="actGetCargo">Hämta last</span></button>
+                <button id="p4-btn-refill" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleRefillPocket(4)">🔄 <span data-key="actRefillPocket">Ladda om ficka</span></button>
+                <button id="p4-btn-drop-cargo" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleDropCargo(4)">👑 <span data-key="actDropCargo">Lämna last</span></button>
+                <button onclick="window.NoirUI.openManualArrestModal(4)" class="btn-danger">🚨 <span data-key="actArrest">Haffad</span></button>
+                <button onclick="window.NoirUI.openFightModal(4)" class="btn-fight">💥 <span data-key="actFight">Slagsmål</span></button>
+                <button onclick="window.NoirUI.openPayModal(4)" class="btn-pay">💸 <span data-key="actPay">Överför pengar ➔</span></button>
+            </div>
+        </div>
+
+        <div class="side-bar-left">THE NOIR SYNDICATE</div>
+        <div class="side-bar-right">BOARD HUB v2.0</div>
+
+        <!-- Mittkonsol / Tärning -->
+        <div class="center-console">
+            <div class="dice-wrapper">
+                <div id="dice-container" onclick="window.NoirUI.rollDice()">
+                    <div class="dot" id="d1"></div><div class="dot" id="d2"></div><div class="dot" id="d3"></div>
+                    <div class="dot" id="d4"></div><div class="dot" id="d5"></div><div class="dot" id="d6"></div>
+                    <div class="dot" id="d7"></div><div class="dot" id="d8"></div><div class="dot" id="d9"></div>
+                </div>
+                <div class="dice-label pulse-text" id="dice-label" data-key="diceClick">KLICKA FÖR ATT SLÅ</div>
+            </div>
+            <div style="display:flex; gap:8px; width: 100%; max-width: 240px; justify-content: center; flex-wrap: wrap;">
+                <button onclick="window.NoirUI.openRulesModal()" style="font-size:11px; padding:6px 12px; background:rgba(0,0,0,0.6);" data-key="btnRules">📜 Regler</button>
+                <button onclick="window.NoirUI.openAdjustModal()" style="font-size:11px; padding:6px 12px; background:rgba(0,0,0,0.6); color:#666;" data-key="btnAdjust">🛠️ Justera</button>
+                <button onclick="window.NoirUI.resetGame()" style="font-size:11px; padding:6px 12px; background:rgba(0,0,0,0.6); color:#666;" data-key="btnReset">Återställ</button>
+            </div>
+        </div>
+
+        <!-- Spelare 3: Klöver -->
+        <div class="player-corner" id="p3">
+            <div class="gang-header">
+                <div class="gang-title" id="p3-gang-title">♣ Iron Clovers</div>
+                <div class="deck-suit suit-black" data-key="suitClovers">Klöver</div>
+            </div>
+            <div class="direction-badge" id="p3-direction-badge"></div>
+            <div class="stats-grid">
+                <div class="stat-box pocket-box">
+                    <div class="stat-label" data-key="statPocket">💼 Fickan</div>
+                    <div class="stat-value" id="p3-pocket">$20</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label" data-key="statVault">🔒 Kista</div>
+                    <div class="stat-value" id="p3-vault" style="color:var(--clovers-color)">$0</div>
+                </div>
+            </div>
+            <div class="gang-actions">
+                <button id="p3-btn-get-cargo" class="btn-success btn-cargo-action" onclick="window.NoirUI.handleGetCargo(3)">💰 <span data-key="actGetCargo">Hämta last</span></button>
+                <button id="p3-btn-refill" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleRefillPocket(3)">🔄 <span data-key="actRefillPocket">Ladda om ficka</span></button>
+                <button id="p3-btn-drop-cargo" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleDropCargo(3)">👑 <span data-key="actDropCargo">Lämna last</span></button>
+                <button onclick="window.NoirUI.openManualArrestModal(3)" class="btn-danger">🚨 <span data-key="actArrest">Haffad</span></button>
+                <button onclick="window.NoirUI.openFightModal(3)" class="btn-fight">💥 <span data-key="actFight">Slagsmål</span></button>
+                <button onclick="window.NoirUI.openPayModal(3)" class="btn-pay">💸 <span data-key="actPay">Överför pengar ➔</span></button>
+            </div>
+        </div>
+
+        <!-- Spelare 2: Hjärter -->
+        <div class="player-corner" id="p2">
+            <div class="gang-header">
+                <div class="gang-title" id="p2-gang-title">♥ Crimson</div>
+                <div class="deck-suit suit-red" data-key="suitHearts">Hjärter</div>
+            </div>
+            <div class="direction-badge" id="p2-direction-badge"></div>
+            <div class="stats-grid">
+                <div class="stat-box pocket-box">
+                    <div class="stat-label" data-key="statPocket">💼 Fickan</div>
+                    <div class="stat-value" id="p2-pocket">$20</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label" data-key="statVault">🔒 Kista</div>
+                    <div class="stat-value" id="p2-vault" style="color:var(--hearts-color)">$0</div>
+                </div>
+            </div>
+            <div class="gang-actions">
+                <button id="p2-btn-get-cargo" class="btn-success btn-cargo-action" onclick="window.NoirUI.handleGetCargo(2)">💰 <span data-key="actGetCargo">Hämta last</span></button>
+                <button id="p2-btn-refill" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleRefillPocket(2)">🔄 <span data-key="actRefillPocket">Ladda om ficka</span></button>
+                <button id="p2-btn-drop-cargo" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleDropCargo(2)">👑 <span data-key="actDropCargo">Lämna last</span></button>
+                <button onclick="window.NoirUI.openManualArrestModal(2)" class="btn-danger">🚨 <span data-key="actArrest">Haffad</span></button>
+                <button onclick="window.NoirUI.openFightModal(2)" class="btn-fight">💥 <span data-key="actFight">Slagsmål</span></button>
+                <button onclick="window.NoirUI.openPayModal(2)" class="btn-pay">💸 <span data-key="actPay">Överför pengar ➔</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobilflikar (iPhone) -->
+    <div class="iphone-tabs" id="iphone-tabs">
+        <button class="tab-btn active" data-tab="1" onclick="window.NoirUI.switchTab(1)"><span>♠</span><span data-key="suitSpades">Spader</span></button>
+        <button class="tab-btn" data-tab="2" onclick="window.NoirUI.switchTab(2)"><span>♥</span><span data-key="suitHearts">Hjärter</span></button>
+        <button class="tab-btn" data-tab="3" onclick="window.NoirUI.switchTab(3)"><span>♣</span><span data-key="suitClovers">Klöver</span></button>
+        <button class="tab-btn" data-tab="4" onclick="window.NoirUI.switchTab(4)"><span>♦</span><span data-key="suitDiamonds">Ruter</span></button>
+    </div>
+
+    <!-- Händelsekort -->
+    <div class="overlay" id="event-overlay">
+        <div class="popup">
+            <div class="popup-dice-badge" id="event-dice-badge"></div>
+            <div class="order-notice" data-key="eventNotice">⚠️ Utför händelsen först — flytta pjäsen sen!</div>
+            <div class="popup-title" id="event-title"></div>
+            <div class="popup-desc" id="event-desc"></div>
+            <button class="popup-btn" onclick="window.NoirUI.closeEventPopup()" data-key="btnOk">Uppfattat</button>
+        </div>
+    </div>
+
+    <!-- NYTT v2: Polisval vid tärning 5/6 -->
+    <div class="overlay" id="cop-choice-overlay">
+        <div class="popup" style="border-color:#ecc94b;">
+            <div class="popup-title" style="color:#ecc94b;" id="cop-choice-title"></div>
+            <div class="popup-desc" id="cop-choice-desc"></div>
+            <div class="police-selector-grid" id="cop-choice-options"></div>
+        </div>
+    </div>
+
+    <!-- NYTT v2: Landade knekten på en motståndare? -->
+    <div class="overlay" id="cop-landed-overlay">
+        <div class="popup" style="border-color:#e53e3e;">
+            <div class="popup-title" style="color:#e53e3e;" data-key="copLandedTitle">Landade din knekt på en motståndare?</div>
+            <div class="popup-desc" data-key="copLandedDesc">Om din polis landade på en motståndares pjäs blir denne haffad direkt.</div>
+            <button class="popup-btn" id="cop-landed-yes-btn" data-key="copLandedYes" style="background:#9c2b2b;">Ja, haffa spelaren</button>
+            <button class="popup-btn" id="cop-landed-no-btn" data-key="copLandedNo" style="background:#1a1a1a; margin-top:8px;">Nej, gå vidare</button>
+        </div>
+    </div>
+
+    <!-- Betalning -->
+    <div class="overlay" id="pay-overlay">
+        <div class="popup" style="border-color:#ecc94b;">
+            <div class="popup-title" style="color:#ecc94b;" id="pay-title" data-key="payHeader">Skicka pengar</div>
+            <div class="pay-grid">
+                <div>
+                    <label for="pay-target" data-key="payRecipient">Mottagare</label>
+                    <select id="pay-target"></select>
+                </div>
+                <div>
+                    <label for="pay-amount" data-key="paySum">Belopp ($)</label>
+                    <input type="number" id="pay-amount" value="10" min="1">
+                </div>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button onclick="window.NoirUI.executePaymentFromModal()" class="btn-success" style="padding:10px; width:50%;" data-key="btnConfirm">Bekräfta</button>
+                <button onclick="window.NoirUI.closePayModal()" style="background:#1a1a1a; padding:10px; width:50%;" data-key="btnCancel">Avbryt</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Arrestering (används för både manuellt "Haffad" och knektflytt-flödet) -->
+    <div class="overlay" id="police-overlay">
+        <div class="popup" style="border-color:#e53e3e;">
+            <div class="popup-title" style="color:#e53e3e;" id="police-title" data-key="policeTitle">Vem gjorde gripandet?</div>
+            <p style="font-size:13px; color:#a0aec0; margin-bottom:10px;" id="police-subtitle" data-key="policeSubtitle">Pengarna tillfaller stadens kassa.</p>
+            <div class="police-selector-grid" id="police-targets"></div>
+            <button onclick="window.NoirUI.closePoliceModal()" style="background:#1a1a1a; padding:10px; width:100%; margin-top:10px;" data-key="btnCancel">Avbryt</button>
+        </div>
+    </div>
+
+    <!-- Slagsmål -->
+    <div class="overlay" id="fight-overlay">
+        <div class="popup" style="border-color:#ff7849;">
+            <div class="popup-title" style="color:#ff7849;" data-key="fightTitle">Gatuslagsmål!</div>
+            <div id="fight-setup-view">
+                <p style="font-size:13px; color:#a0aec0; margin-bottom:15px;" data-key="fightPrompt">Välj vilken motståndare som står på rutan och ska attackeras:</p>
+                <div class="police-selector-grid" id="fight-targets"></div>
+                <button onclick="window.NoirUI.closeFightModal()" style="background:#1a1a1a; padding:10px; width:100%; margin-top:12px;" data-key="btnCancel">Avbryt</button>
+            </div>
+            <div id="fight-rolling-view" style="display:none;">
+                <div class="fight-dice-container">
+                    <div class="fight-dice-box">
+                        <div class="fight-dice-name" id="fight-attacker-name">Anfallare</div>
+                        <div class="fight-dice-value" id="fight-attacker-dice">-</div>
+                    </div>
+                    <div class="fight-dice-box">
+                        <div class="fight-dice-name" id="fight-defender-name">Försvarare</div>
+                        <div class="fight-dice-value" id="fight-defender-dice">-</div>
+                    </div>
+                </div>
+                <div class="order-notice" id="fight-status-label" style="margin-bottom:0;">RULLAR KNOGJÄRNEN...</div>
+                <button class="popup-btn" id="fight-close-btn" onclick="window.NoirUI.closeFightModal()" style="display:none;">Avsluta duell</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Justera (admin) -->
+    <div class="overlay" id="adjust-overlay">
+        <div class="popup" style="border-color:#ecc94b; max-width: 400px;">
+            <div class="popup-title" style="color:#ecc94b;" data-key="modTitle">Justera spelarvärden</div>
+            <div class="pay-grid" style="grid-template-columns: 1fr; gap: 8px;">
+                <div>
+                    <label for="mod-player" data-key="modLblPlayer">Välj syndikat</label>
+                    <select id="mod-player" onchange="window.NoirUI.loadPlayerValuesToModal()"></select>
+                </div>
+            </div>
+            <div class="pay-grid" style="grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px;">
+                <div>
+                    <label for="mod-pocket" data-key="modLblPocket">💼 Fickan</label>
+                    <input type="number" id="mod-pocket" value="20">
+                </div>
+                <div>
+                    <label for="mod-vault" data-key="modLblVault">🔒 Kista</label>
+                    <input type="number" id="mod-vault" value="0">
+                </div>
+            </div>
+            <div class="pay-grid" style="grid-template-columns: 1fr; gap: 8px; margin-top: 8px;">
+                <div>
+                    <label for="mod-citybank" data-key="modLblCityBank">🏛️ Stadens kassa</label>
+                    <input type="number" id="mod-citybank" value="100000">
+                </div>
+            </div>
+            <div style="display:flex; gap:10px; margin-top: 20px;">
+                <button onclick="window.NoirUI.saveAdjustments()" class="btn-success" style="padding:10px; width:50%;" data-key="btnConfirm">Bekräfta</button>
+                <button onclick="window.NoirUI.closeAdjustModal()" style="background:#1a1a1a; padding:10px; width:50%;" data-key="btnCancel">Avbryt</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Regler -->
+    <div class="overlay" id="rules-overlay">
+        <div class="popup popup-large" id="rules-content-area"></div>
+    </div>
+
+    <!-- NYTT v2: Bekräftelsedialog (ersätter window.confirm/alert) -->
+    <div class="overlay" id="confirm-overlay">
+        <div class="popup">
+            <div class="popup-desc" id="confirm-message" style="margin-bottom:20px;"></div>
+            <div style="display:flex; gap:10px;">
+                <button id="confirm-yes-btn" class="btn-danger" style="padding:10px; width:50%;" data-key="btnConfirm">Bekräfta</button>
+                <button onclick="document.getElementById('confirm-overlay').classList.remove('active')" style="background:#1a1a1a; padding:10px; width:50%;" data-key="btnCancel">Avbryt</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NYTT v2: Vinst-overlay -->
+    <div class="overlay" id="win-overlay">
+        <div class="popup">
+            <div class="popup-title" style="color:#ecc94b;">🏆</div>
+            <div id="win-message"></div>
+            <button class="popup-btn" onclick="window.NoirUI.resetGame()" data-key="btnReset">Återställ</button>
+        </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
