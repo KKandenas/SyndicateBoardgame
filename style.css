@@ -54,7 +54,7 @@ body {
 .welcome-screen {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     background-color: #050505;
-    background-image: linear-gradient(to bottom, rgba(5, 5, 5, 0.4), rgba(0, 0, 0, 0.85)), url('gangsters.png');
+    background-image: linear-gradient(to bottom, rgba(5, 5, 5, 0.4), rgba(0, 0, 0, 0.85)), url('gangsters.PNG');
     background-size: cover; background-position: center 30%;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     z-index: 999;
