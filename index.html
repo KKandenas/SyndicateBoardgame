@@ -21,12 +21,8 @@
         <button class="btn-lang" id="live-lang-en" onclick="window.NoirUI.setLanguage('en')">EN</button>
     </div>
 
-    <!-- NYTT v2: Turordnings-HUD + Stadsbank-HUD -->
+    <!-- NYTT v2: Turordnings-HUD -->
     <div id="turn-banner"></div>
-    <div id="city-bank-hud">
-        <div style="font-size:9px; opacity:0.7;" data-key="statCityBank">🏛️ Stadens kassa</div>
-        <div id="city-bank-value">$0</div>
-    </div>
     <button id="btn-next-player" onclick="window.NoirUI.nextPlayer()" data-key="btnNextPlayer">✅ Nästa spelare</button>
 
     <!-- Startskärm -->
@@ -81,7 +77,6 @@
                 <button id="p1-btn-get-cargo" class="btn-success btn-cargo-action" onclick="window.NoirUI.handleGetCargo(1)">💰 <span data-key="actGetCargo">Hämta last</span></button>
                 <button id="p1-btn-refill" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleRefillPocket(1)">🔄 <span data-key="actRefillPocket">Ladda om ficka</span></button>
                 <button id="p1-btn-drop-cargo" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleDropCargo(1)">👑 <span data-key="actDropCargo">Lämna last</span></button>
-                <button onclick="window.NoirUI.openManualArrestModal(1)" class="btn-danger">🚨 <span data-key="actArrest">Haffad</span></button>
                 <button onclick="window.NoirUI.openFightModal(1)" class="btn-fight">💥 <span data-key="actFight">Slagsmål</span></button>
                 <button onclick="window.NoirUI.openPayModal(1)" class="btn-pay">💸 <span data-key="actPay">Överför pengar ➔</span></button>
             </div>
@@ -108,7 +103,6 @@
                 <button id="p4-btn-get-cargo" class="btn-success btn-cargo-action" onclick="window.NoirUI.handleGetCargo(4)">💰 <span data-key="actGetCargo">Hämta last</span></button>
                 <button id="p4-btn-refill" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleRefillPocket(4)">🔄 <span data-key="actRefillPocket">Ladda om ficka</span></button>
                 <button id="p4-btn-drop-cargo" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleDropCargo(4)">👑 <span data-key="actDropCargo">Lämna last</span></button>
-                <button onclick="window.NoirUI.openManualArrestModal(4)" class="btn-danger">🚨 <span data-key="actArrest">Haffad</span></button>
                 <button onclick="window.NoirUI.openFightModal(4)" class="btn-fight">💥 <span data-key="actFight">Slagsmål</span></button>
                 <button onclick="window.NoirUI.openPayModal(4)" class="btn-pay">💸 <span data-key="actPay">Överför pengar ➔</span></button>
             </div>
@@ -155,7 +149,6 @@
                 <button id="p3-btn-get-cargo" class="btn-success btn-cargo-action" onclick="window.NoirUI.handleGetCargo(3)">💰 <span data-key="actGetCargo">Hämta last</span></button>
                 <button id="p3-btn-refill" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleRefillPocket(3)">🔄 <span data-key="actRefillPocket">Ladda om ficka</span></button>
                 <button id="p3-btn-drop-cargo" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleDropCargo(3)">👑 <span data-key="actDropCargo">Lämna last</span></button>
-                <button onclick="window.NoirUI.openManualArrestModal(3)" class="btn-danger">🚨 <span data-key="actArrest">Haffad</span></button>
                 <button onclick="window.NoirUI.openFightModal(3)" class="btn-fight">💥 <span data-key="actFight">Slagsmål</span></button>
                 <button onclick="window.NoirUI.openPayModal(3)" class="btn-pay">💸 <span data-key="actPay">Överför pengar ➔</span></button>
             </div>
@@ -182,7 +175,6 @@
                 <button id="p2-btn-get-cargo" class="btn-success btn-cargo-action" onclick="window.NoirUI.handleGetCargo(2)">💰 <span data-key="actGetCargo">Hämta last</span></button>
                 <button id="p2-btn-refill" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleRefillPocket(2)">🔄 <span data-key="actRefillPocket">Ladda om ficka</span></button>
                 <button id="p2-btn-drop-cargo" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleDropCargo(2)">👑 <span data-key="actDropCargo">Lämna last</span></button>
-                <button onclick="window.NoirUI.openManualArrestModal(2)" class="btn-danger">🚨 <span data-key="actArrest">Haffad</span></button>
                 <button onclick="window.NoirUI.openFightModal(2)" class="btn-fight">💥 <span data-key="actFight">Slagsmål</span></button>
                 <button onclick="window.NoirUI.openPayModal(2)" class="btn-pay">💸 <span data-key="actPay">Överför pengar ➔</span></button>
             </div>
@@ -251,8 +243,8 @@
     <!-- Arrestering (används för både manuellt "Haffad" och knektflytt-flödet) -->
     <div class="overlay" id="police-overlay">
         <div class="popup" style="border-color:#e53e3e;">
-            <div class="popup-title" style="color:#e53e3e;" id="police-title" data-key="policeTitle">Vem gjorde gripandet?</div>
-            <p style="font-size:13px; color:#a0aec0; margin-bottom:10px;" id="police-subtitle" data-key="policeSubtitle">Pengarna tillfaller stadens kassa.</p>
+            <div class="popup-title" style="color:#e53e3e;" id="police-title" data-key="policeTitle">Vem blev gripen?</div>
+            <p style="font-size:13px; color:#a0aec0; margin-bottom:10px;" id="police-subtitle" data-key="policeSubtitle">Fickpengarna tillfaller din egen ficka.</p>
             <div class="police-selector-grid" id="police-targets"></div>
             <button onclick="window.NoirUI.closePoliceModal()" style="background:#1a1a1a; padding:10px; width:100%; margin-top:10px;" data-key="btnCancel">Avbryt</button>
         </div>
