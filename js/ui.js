@@ -40,8 +40,9 @@ let isRolling = false;
 let isFighting = false;
 let activePayerId = null;
 let activeAttackerId = null;
-let manualArrestMode = false;   // true = "Haffad"-knapp, false = knektflytt-flöde
 let currentActiveEventIndex = null;
+let pendingDiceSteps = null;   // hur många steg huvudpjäsen ska gå, väntar på att annonseras
+let copFlowContext = null;     // håller reda på var i 5:an/6:an-kedjan vi befinner oss
 
 // ▶ SEKTION: Hjälpfunktioner
 function qs(id) { return document.getElementById(id); }
@@ -85,6 +86,14 @@ function renderAll() {
     renderCityBank(state);
     renderWinOverlay(state);
     renderRules();
+
+    // NYTT: på iPhone växlar vi automatiskt till den flik vars tur det är,
+    // t.ex. direkt när "Nästa spelare" trycks. Manuell flikbläddring för
+    // att kika på andra spelares paneler stör inte detta, eftersom
+    // switchTab() i sig inte triggar en ny renderAll().
+    if (document.body.classList.contains('mode-iphone') && !state.gameOver) {
+        switchTab(state.activePlayerId);
+    }
 }
 
 function renderPlayerPanel(id) {
@@ -225,10 +234,15 @@ function finishDiceRoll(label) {
     }, 3000);
 
     const interpretation = resolveDiceRoll(finalResult);
-    toast(`${interpretation.steps} steg`, 'info');
 
     if (interpretation.requiresCopChoice) {
+        // Vid 5:a/6:a görs polis-/händelsevalet FÖRST — pjäsflytten
+        // annonseras sist, efter att hela kedjan är klar (se
+        // handleCopChoice / proceedAfterEventStage / announceMainSteps).
+        pendingDiceSteps = interpretation.steps;
         openCopChoiceModal(finalResult, interpretation.options);
+    } else {
+        toast(interpolate(t('moveTokenNow'), { steps: interpretation.steps }), 'info');
     }
 }
 
@@ -270,13 +284,34 @@ function openCopChoiceModal(roll, options) {
 function handleCopChoice(choiceId) {
     hideOverlay('cop-choice-overlay');
     const { copSteps, drawsEvent, copMoved } = resolveCopChoice(choiceId);
+    copFlowContext = { copSteps, drawsEvent, copMoved, mainSteps: pendingDiceSteps };
+    pendingDiceSteps = null;
 
     if (drawsEvent) {
-        openEventPopup();
+        openEventPopup(); // fortsätter kedjan i closeEventPopup() -> proceedAfterEventStage()
+    } else {
+        proceedAfterEventStage();
     }
-    if (copMoved) {
-        toast(`Flytta din knekt ${copSteps} steg`, 'info');
+}
+
+// Fortsätter kedjan efter ett ev. händelsekort: knektflytt -> "landade
+// den på någon?" -> och till sist annonsering av huvudpjäsens flytt.
+function proceedAfterEventStage() {
+    if (!copFlowContext) return;
+    if (copFlowContext.copMoved) {
+        toast(interpolate(t('moveCopNow'), { steps: copFlowContext.copSteps }), 'info');
         openCopLandedModal();
+    } else {
+        announceMainSteps();
+    }
+}
+
+// Sista steget i 5:an/6:an-kedjan: berätta hur många steg huvudpjäsen
+// (Ess/Kung-token) ska flyttas, nu när ev. polis/händelse är klar.
+function announceMainSteps() {
+    if (copFlowContext) {
+        toast(interpolate(t('moveTokenNow'), { steps: copFlowContext.mainSteps }), 'info');
+        copFlowContext = null;
     }
 }
 
@@ -284,10 +319,12 @@ function handleCopChoice(choiceId) {
 function openCopLandedModal() {
     qs('cop-landed-yes-btn').onclick = () => {
         hideOverlay('cop-landed-overlay');
-        manualArrestMode = false;
         openArrestTargetModal(getCurrentTurnPlayerId());
     };
-    qs('cop-landed-no-btn').onclick = () => hideOverlay('cop-landed-overlay');
+    qs('cop-landed-no-btn').onclick = () => {
+        hideOverlay('cop-landed-overlay');
+        announceMainSteps();
+    };
     showOverlay('cop-landed-overlay');
 }
 
@@ -304,6 +341,7 @@ function openEventPopup() {
 export function closeEventPopup() {
     hideOverlay('event-overlay');
     currentActiveEventIndex = null;
+    proceedAfterEventStage();
 }
 
 // ▶ SEKTION: Ekonomi
@@ -357,34 +395,11 @@ export function executePaymentFromModal() {
 }
 
 // ▶ SEKTION: Arrestering
-// Manuellt "Haffad"-flöde: den aktiva spelaren rapporterar att DE
-// själva blev haffade, och väljer sedan vilken polis som grep dem.
-export function openManualArrestModal(victimId) {
-    manualArrestMode = true;
-    openCopOwnerModal(victimId);
-}
-
-function openCopOwnerModal(victimId) {
-    qs('police-title').innerText = t('policeTitle');
-    qs('police-subtitle').innerText = t('policeSubtitle');
-    const grid = qs('police-targets');
-    grid.innerHTML = '';
-    getOtherActivePlayers(victimId).forEach(p => {
-        const btn = document.createElement('button');
-        btn.className = 'police-btn';
-        btn.innerText = `👮‍♂️ ${gangName(p.id)}`;
-        btn.onclick = () => {
-            const res = executeArrest(getCurrentTurnPlayerId(), victimId, p.id);
-            reportArrestResult(res, victimId, p.id);
-            hideOverlay('police-overlay');
-        };
-        grid.appendChild(btn);
-    });
-    showOverlay('police-overlay');
-}
-
-// Knektflytt-flöde: den aktiva spelarens egen polis grep offret,
-// så vi frågar bara VEM som greps (copOwner = aktiv spelare).
+// Enda kvarvarande flödet: den aktiva spelarens EGEN polis (flyttad via
+// movement.js vid tärning 5/6, eller "Mutor"-händelsekortet) grep någon.
+// Vi frågar bara VEM som greps (copOwner = aktiv spelare per definition).
+// Det manuella "Haffad"-flödet är borttaget — hanteras nu helt automatiskt
+// via knektflytt-kedjan.
 function openArrestTargetModal(activePlayerId) {
     qs('police-title').innerText = t('policeTitle');
     qs('police-subtitle').innerText = t('policeSubtitle');
@@ -398,6 +413,7 @@ function openArrestTargetModal(activePlayerId) {
             const res = executeArrestFromCopMove(activePlayerId, p.id);
             reportArrestResult(res, p.id, activePlayerId);
             hideOverlay('police-overlay');
+            announceMainSteps();
         };
         grid.appendChild(btn);
     });
