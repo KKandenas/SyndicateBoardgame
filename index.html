@@ -23,7 +23,6 @@
 
     <!-- NYTT v2: Turordnings-HUD -->
     <div id="turn-banner"></div>
-    <button id="btn-next-player" onclick="window.NoirUI.nextPlayer()" data-key="btnNextPlayer">✅ Nästa spelare</button>
 
     <!-- Startskärm -->
     <div class="welcome-screen" id="welcome-screen">
@@ -122,6 +121,7 @@
                 <div class="dice-label pulse-text" id="dice-label" data-key="diceClick">KLICKA FÖR ATT SLÅ</div>
             </div>
             <div style="display:flex; gap:8px; width: 100%; max-width: 240px; justify-content: center; flex-wrap: wrap;">
+                <button id="btn-next-player" onclick="window.NoirUI.nextPlayer()" data-key="btnNextPlayer" style="grid-column: 1 / -1; width:100%;">✅ Nästa spelare</button>
                 <button onclick="window.NoirUI.openRulesModal()" style="font-size:11px; padding:6px 12px; background:rgba(0,0,0,0.6);" data-key="btnRules">📜 Regler</button>
                 <button onclick="window.NoirUI.openAdjustModal()" style="font-size:11px; padding:6px 12px; background:rgba(0,0,0,0.6); color:#666;" data-key="btnAdjust">🛠️ Justera</button>
                 <button onclick="window.NoirUI.resetGame()" style="font-size:11px; padding:6px 12px; background:rgba(0,0,0,0.6); color:#666;" data-key="btnReset">Återställ</button>
