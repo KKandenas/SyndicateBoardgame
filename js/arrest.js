@@ -35,26 +35,29 @@ export const ArrestResult = {
 // spelaren (skyddar mot fel-tur-anrop). victimId och copOwnerId väljs
 // i UI:ts modal.
 //
-// ÄNDRAT (playtest-beslut): beslagtagna pengar går till den GRIPANDE
-// SPELARENS egen ficka, inte längre till stadsbanken. Offret skickas
-// tillbaka till sitt Ess (fysiskt, hanteras av spelarna vid bordet)
-// med fickan återställd till $20.
+// ÄNDRAT (playtest-beslut): HELA offrets fickinnehåll — inte bara
+// beloppet över $20 — går till den gripande spelarens ficka, oavsett
+// hur mycket offret hade (även under $20). Offret skickas sedan
+// tillbaka till sitt Ess (fysiskt, hanteras av spelarna) och fickan
+// laddas alltid om till $20.
 export function executeArrest(actingPlayerId, victimId, copOwnerId) {
     assertCanAct(actingPlayerId);
 
     const victim = getPlayer(victimId);
     const copOwner = getPlayer(copOwnerId);
+    const loot = victim.pocket;
 
-    if (victim.pocket > START_POCKET) {
-        const loot = victim.pocket - START_POCKET;
+    if (loot > 0) {
         mutatePlayer(copOwnerId, { pocket: copOwner.pocket + loot });
-        mutatePlayer(victimId, { pocket: START_POCKET });
-        return { result: ArrestResult.LOOTED, loot, victimId, copOwnerId };
     }
+    mutatePlayer(victimId, { pocket: START_POCKET });
 
-    // Offret hade redan bara sina $20 — inget att beslagta,
-    // men de skickas ändå till häktet (fysiskt, hanteras av spelarna).
-    return { result: ArrestResult.NO_LOOT, loot: 0, victimId, copOwnerId };
+    return {
+        result: loot > 0 ? ArrestResult.LOOTED : ArrestResult.NO_LOOT,
+        loot,
+        victimId,
+        copOwnerId
+    };
 }
 
 // Genväg för flödet efter en knektflytt (movement.js): där är
