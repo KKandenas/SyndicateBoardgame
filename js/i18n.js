@@ -95,6 +95,8 @@ export const i18n = {
         paySum: "Annat belopp ($)",
         payPayer: " betalar",
         payQuickAmount: "Snabbval belopp",
+        alertPickRecipient: "Välj en mottagare först!",
+        alertPickAmount: "Ange ett belopp först!",
 
         // --- Polis / arrestering ---
         policeTitle: "Vem blev gripen?",
@@ -210,6 +212,8 @@ export const i18n = {
         paySum: "Custom amount ($)",
         payPayer: " pays",
         payQuickAmount: "Quick amounts",
+        alertPickRecipient: "Pick a recipient first!",
+        alertPickAmount: "Enter an amount first!",
 
         policeTitle: "Who got caught?",
         policeSubtitle: "The pocket cash goes to your own pocket. The one caught returns to their King and loses any cargo.",
