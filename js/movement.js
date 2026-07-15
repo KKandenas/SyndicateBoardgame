@@ -55,13 +55,11 @@ export function resolveDiceRoll(rollValue) {
         };
     }
 
-    // 5 och 6: alltid 4 steg + ett val som väntar på spelaren.
-    // Vid 5: flytta knekt 1 steg ELLER dra händelsekort.
-    // Vid 6: flytta knekt 2 steg ELLER dra händelsekort (förenklat
-    // enligt playtest-beslut — ingen kombinerad "knekt+kort"-variant).
+    // 5: flytta knekt 1 steg ELLER dra händelsekort.
+    // 6: flytta knekt 1 steg, ELLER 2 steg, ELLER dra händelsekort.
     const options = rollValue === 5
         ? [COP_CHOICE.MOVE_COP_ONE, COP_CHOICE.DRAW_EVENT]
-        : [COP_CHOICE.MOVE_COP_TWO, COP_CHOICE.DRAW_EVENT];
+        : [COP_CHOICE.MOVE_COP_ONE, COP_CHOICE.MOVE_COP_TWO, COP_CHOICE.DRAW_EVENT];
 
     setPendingCopMove({ roll: rollValue, options, resolved: false });
 
