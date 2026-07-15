@@ -31,9 +31,9 @@ import { isActionAllowed, getCurrentTurnPlayerId, advanceTurn } from './turnOrde
 import { performRoll, getDotsForValue } from './dice.js';
 import { resolveDiceRoll, resolveCopChoice, COP_CHOICE } from './movement.js';
 import { drawRandomEvent } from './events.js';
-import { getCargo, refillPocketAtKing, dropCargoInVault, transferMoney, getPaymentRecipients, CITY_BANK_RECIPIENT, EconomyResult } from './economy.js';
+import { getCargo, refillPocketAtKing, dropCargoInVault, transferMoney, getPaymentRecipients, executePickpocket, CITY_BANK_RECIPIENT, EconomyResult } from './economy.js';
 import { resolveFight } from './combat.js';
-import { executeArrest, executeArrestFromCopMove, ArrestResult } from './arrest.js';
+import { executeArrestFromCopMove, ArrestResult } from './arrest.js';
 
 // ▶ SEKTION: Transient UI-state (hör inte hemma i spelstate.js)
 let isRolling = false;
@@ -43,6 +43,7 @@ let activeAttackerId = null;
 let currentActiveEventIndex = null;
 let pendingDiceSteps = null;   // hur många steg huvudpjäsen ska gå, väntar på att annonseras
 let copFlowContext = null;     // håller reda på var i 5:an/6:an-kedjan vi befinner oss
+let pendingPickpocket = false; // true = det aktuella händelsekortet är Ficktjuv, kräver målval
 
 // ▶ SEKTION: Hjälpfunktioner
 function qs(id) { return document.getElementById(id); }
@@ -243,6 +244,7 @@ function finishDiceRoll(label) {
         openCopChoiceModal(finalResult, interpretation.options);
     } else {
         toast(interpolate(t('moveTokenNow'), { steps: interpretation.steps }), 'info');
+        toast(t('reminderPayRent'), 'info');
     }
 }
 
@@ -260,20 +262,16 @@ function openCopChoiceModal(roll, options) {
     qs('cop-choice-desc').innerText = roll === 5 ? t('copChoice5Desc') : t('copChoice6Desc');
 
     const labelMap = {
-        [COP_CHOICE.ROLL_5_MOVE_COP]: 'copChoiceMove1',
-        [COP_CHOICE.ROLL_5_DRAW_EVENT]: 'drawEventOption',
-        [COP_CHOICE.ROLL_6_MOVE_COP_AND_EVENT]: 'copChoiceMove1Event',
-        [COP_CHOICE.ROLL_6_MOVE_COP_TWO]: 'copChoiceMove2'
+        [COP_CHOICE.MOVE_COP_ONE]: 'copChoiceMove1',
+        [COP_CHOICE.MOVE_COP_TWO]: 'copChoiceMove2',
+        [COP_CHOICE.DRAW_EVENT]: 'copChoiceDrawEvent'
     };
-    // "drawEventOption" saknar egen i18n-nyckel — återanvänder eventNotice-stilen.
     const container = qs('cop-choice-options');
     container.innerHTML = '';
     options.forEach(choiceId => {
         const btn = document.createElement('button');
         btn.className = 'police-btn';
-        btn.innerText = choiceId === COP_CHOICE.ROLL_5_DRAW_EVENT
-            ? '🎴 ' + t('eventNotice').replace('⚠️ ', '')
-            : t(labelMap[choiceId]);
+        btn.innerText = t(labelMap[choiceId]);
         btn.onclick = () => handleCopChoice(choiceId);
         container.appendChild(btn);
     });
@@ -311,6 +309,7 @@ function proceedAfterEventStage() {
 function announceMainSteps() {
     if (copFlowContext) {
         toast(interpolate(t('moveTokenNow'), { steps: copFlowContext.mainSteps }), 'info');
+        toast(t('reminderPayRent'), 'info');
         copFlowContext = null;
     }
 }
@@ -332,6 +331,7 @@ function openCopLandedModal() {
 function openEventPopup() {
     const { index, card } = drawRandomEvent();
     currentActiveEventIndex = index;
+    pendingPickpocket = (card.id === 'pickpocket');
     qs('event-dice-badge').innerText = interpolate(t('eventBadge'), { roll: getState().lastDiceRoll ?? '' });
     qs('event-title').innerText = card.title;
     qs('event-desc').innerText = card.desc;
@@ -341,7 +341,36 @@ function openEventPopup() {
 export function closeEventPopup() {
     hideOverlay('event-overlay');
     currentActiveEventIndex = null;
-    proceedAfterEventStage();
+
+    if (pendingPickpocket) {
+        pendingPickpocket = false;
+        openPickpocketTargetModal();
+    } else {
+        proceedAfterEventStage();
+    }
+}
+
+// Ficktjuv-kortet kräver att spelaren väljer VEM pengarna tas från
+// (staden är aldrig ett alternativ). Fortsätter 5:an/6:an-kedjan
+// (announceMainSteps) när valet är klart.
+function openPickpocketTargetModal() {
+    qs('police-title').innerText = t('pickpocketTitle');
+    qs('police-subtitle').innerText = '';
+    const grid = qs('police-targets');
+    grid.innerHTML = '';
+    getOtherActivePlayers(getCurrentTurnPlayerId()).forEach(p => {
+        const btn = document.createElement('button');
+        btn.className = 'police-btn';
+        btn.innerText = `🕵️ ${gangName(p.id)}`;
+        btn.onclick = () => {
+            const res = executePickpocket(getCurrentTurnPlayerId(), p.id);
+            toast(`+$${res.stolen}`, 'success');
+            hideOverlay('police-overlay');
+            proceedAfterEventStage();
+        };
+        grid.appendChild(btn);
+    });
+    showOverlay('police-overlay');
 }
 
 // ▶ SEKTION: Ekonomi
@@ -590,9 +619,10 @@ function buildRulesHtml(lang) {
         <ul>
             <li><strong>1-4:</strong> Gå så många steg tärningen visar.</li>
             <li><strong>5:</strong> Gå 4 steg. Välj sedan: flytta knekt 1 steg, ELLER dra ett händelsekort.</li>
-            <li><strong>6:</strong> Gå 4 steg. Välj sedan: flytta knekt 1 steg + dra händelsekort, ELLER flytta knekt 2 steg.</li>
+            <li><strong>6:</strong> Gå 4 steg. Välj sedan: flytta knekt 2 steg, ELLER dra ett händelsekort.</li>
             <li>Du får gå framåt, bakåt eller i sidled — aldrig diagonalt (om inte ett händelsekort säger annat).</li>
         </ul>
+        <p style="color:#ecc94b;">💡 Glöm inte att betala tull om du landar på en motståndares kvarter — appen påminner dig efter varje drag, men det är upp till spelarna att göra det manuellt.</p>
         <h2>Skattkistan</h2>
         <p>Fickan och kistan är separata. Om fickan tar slut medan du bär en last: gå tillbaka till din Kung för $20 gratis — du behåller lasten.</p>
         <h2>Regler för brädet</h2>
@@ -612,9 +642,10 @@ function buildRulesHtml(lang) {
         <ul>
             <li><strong>1-4:</strong> Move that many spaces.</li>
             <li><strong>5:</strong> Move 4 spaces. Then choose: move your cop 1 step, OR draw an event card.</li>
-            <li><strong>6:</strong> Move 4 spaces. Then choose: move your cop 1 step + draw an event card, OR move your cop 2 steps.</li>
+            <li><strong>6:</strong> Move 4 spaces. Then choose: move your cop 2 steps, OR draw an event card.</li>
             <li>You may move forward, backward, or sideways — never diagonally (unless an event card says otherwise).</li>
         </ul>
+        <p style="color:#ecc94b;">💡 Don't forget to pay rent if you land on an opponent's quarter — the app reminds you after every move, but it's up to the players to handle it manually.</p>
         <h2>The Vault</h2>
         <p>Pocket cash and the vault are separate. If your pocket runs out while carrying cargo: return to your King for a free $20 refill — you keep the cargo.</p>
         <h2>Board Rules</h2>
