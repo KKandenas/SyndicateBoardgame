@@ -44,7 +44,7 @@ export const i18n = {
         // --- Turordning / HUD (NYTT) ---
         yourTurn: "DIN TUR",
         waitingForPlayer: "Väntar på {name}...",
-        btnNextPlayer: "✅ Avsluta drag / Nästa spelare",
+        btnNextPlayer: "✅ Nästa spelare",
         turnStepMove: "1. Flytta din pjäs",
         turnStepAction: "2. Utför ev. handling",
         turnStepEnd: "3. Klart? Tryck Nästa spelare",
@@ -97,6 +97,7 @@ export const i18n = {
         payQuickAmount: "Snabbval belopp",
         alertPickRecipient: "Välj en mottagare först!",
         alertPickAmount: "Ange ett belopp först!",
+        economicCrisisActive: "📉 Ekonomisk kris pågår denna runda — dubbel tull!",
 
         // --- Polis / arrestering ---
         policeTitle: "Vem blev gripen?",
@@ -167,7 +168,7 @@ export const i18n = {
 
         yourTurn: "YOUR TURN",
         waitingForPlayer: "Waiting for {name}...",
-        btnNextPlayer: "✅ End Turn / Next Player",
+        btnNextPlayer: "✅ Next Player",
         turnStepMove: "1. Move your token",
         turnStepAction: "2. Resolve any action",
         turnStepEnd: "3. Done? Tap Next Player",
@@ -214,6 +215,7 @@ export const i18n = {
         payQuickAmount: "Quick amounts",
         alertPickRecipient: "Pick a recipient first!",
         alertPickAmount: "Enter an amount first!",
+        economicCrisisActive: "📉 Economic crisis in effect this round — double rent!",
 
         policeTitle: "Who got caught?",
         policeSubtitle: "The pocket cash goes to your own pocket. The one caught returns to their King and loses any cargo.",
