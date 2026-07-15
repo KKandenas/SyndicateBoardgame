@@ -125,6 +125,8 @@ export const i18n = {
         fightLogWinnerBankrupt: "VINNARE: {winner}! Förloraren {loser} har inte råd att betala. Fickan laddas om till $20.",
         fightLogDraw: "OAVGJORT! {winner} försvarade rutan! Tar $10 och skickar bort anfallaren.",
         fightLogWinner: "VINNARE: {winner}! Tar $10 från förloraren.",
+        fightLoserToKing: "{loser} var på väg mot Ess — flyttar tillbaka till sin Kung.",
+        fightLoserToAce: "{loser} var på väg mot Kung — flyttar tillbaka till sitt Ess.",
 
         // --- Händelsekort (chrome) ---
         eventNotice: "⚠️ Utför händelsen först — flytta pjäsen sen!",
@@ -233,6 +235,8 @@ export const i18n = {
         fightLogWinnerBankrupt: "WINNER: {winner}! Loser {loser} can't afford to pay. Pocket refilled to $20.",
         fightLogDraw: "DRAW! {winner} defended the block! Takes $10 and expels the attacker.",
         fightLogWinner: "WINNER: {winner}! Takes $10 from the loser.",
+        fightLoserToKing: "{loser} was heading to their Ace — moves back to their King.",
+        fightLoserToAce: "{loser} was heading to their King — moves back to their Ace.",
 
         eventNotice: "⚠️ Execute the event first — move your piece after!",
         eventBadge: "ROLLED A {roll} 🎲",
