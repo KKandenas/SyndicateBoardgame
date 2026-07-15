@@ -606,38 +606,92 @@ function renderRules() {
 
 function buildRulesHtml(lang) {
     // Regeltexten är statisk innehåll (inte spelregler i kod), så den
-    // hålls enkel som en HTML-sträng per språk. Uppdaterad för v2:
-    // stadsbank, skattkista, riktning, ny tärningsregel, 2-4 spelare.
+    // hålls som en HTML-sträng per språk. Bygger vidare på v1:s röst
+    // och struktur (1920-talets Chicago-gängkänsla), uppdaterad med
+    // alla v2-regler: stadskassa, skattkista/ficka-separation, ny
+    // tärningsregel, automatisk arrestering, 2-4 spelare, m.m.
     const R = i18n[lang];
     return lang === 'sv' ? `
-        <h1 style="color:#2b6cb0; text-align:center;">THE NOIR SYNDICATE v2 — REGLER</h1>
-        <h2>Mål</h2>
-        <p>Hämta skattkistor ($1000 st) hos din Kung, bär dem i fickan till ditt Ess, och säkra dem i din kista. Först till <strong>$${WINNING_VAULT}</strong> säkrat (3 kistor) vinner.</p>
+        <h1 style="color:#2b6cb0; text-align:center; letter-spacing: 2px;">THE NOIR SYNDICATE — REGLER</h1>
+
+        <h2>Spelplan & Setup (Kortlayout)</h2>
+        <p>Bygg upp spelplanen på bordet med en vanlig kortlek enligt bilden nedan. Grundmönstret: Ess i hörnen, Kungar på kanterna, gator däremellan, och samtliga Knektar (poliser) startar samlade på polisstationen i mitten. Varje spelare placerar sin droska på sitt eget Ess. Ess och Kung ligger fast hela spelet och flyttas aldrig.</p>
+        <div class="setup-image-container"><img src="setup.PNG" alt="Setup"></div>
+        <p>Spelar ni 2 eller 3 syndikat: de oanvända färgernas Ess och Kung ligger ändå kvar på bordet som vanligt — de är helt enkelt inte i spel den här kvällen.</p>
+
+        <h2>Spelidé & Mål</h2>
+        <p>Du leder ett brottssyndikat i 1920-talets Chicago. Din uppgift är att hämta laster med svarta pengar — skattkistor värda $1000 styck — hos din Boss (Kung), smuggla dem genom stadens farliga gator, och gömma dem säkert i ditt Högkvarter (Ess). Först till <strong>tre fulla kistor ($${WINNING_VAULT} totalt)</strong> säkrade i sin kista tar över staden och vinner spelet.</p>
+
         <h2>Turordning</h2>
-        <p>Endast den aktiva spelaren kan agera. Slå tärningen, flytta din pjäs, utför ev. handling, tryck sedan "${R.btnNextPlayer}".</p>
+        <p>Bara en spelare i taget styr appen — namnet syns i turordnings-bannern högst upp. Slå tärningen, flytta din droska på brädet, gör upp eventuella affärer (betala tull, slagsmål, etc.), och avsluta ditt drag genom att trycka "${R.btnNextPlayer}". Turordningen följer bordets layout medurs: <strong>Nightspades → Diamond → Crimson → Iron Clovers</strong>.</p>
+
         <h2>Tärningsregel</h2>
         <ul>
             <li><strong>1-4:</strong> Gå så många steg tärningen visar.</li>
-            <li><strong>5:</strong> Gå 4 steg. Välj sedan: flytta knekt 1 steg, ELLER dra ett händelsekort.</li>
-            <li><strong>6:</strong> Gå 4 steg. Välj sedan: flytta knekt 2 steg, ELLER dra ett händelsekort.</li>
+            <li><strong>5:</strong> Gå 4 steg. Välj sedan: flytta din knekt 1 steg, ELLER dra ett händelsekort.</li>
+            <li><strong>6:</strong> Gå 4 steg. Välj sedan: flytta din knekt 2 steg, ELLER dra ett händelsekort.</li>
             <li>Du får gå framåt, bakåt eller i sidled — aldrig diagonalt (om inte ett händelsekort säger annat).</li>
         </ul>
-        <p style="color:#ecc94b;">💡 Glöm inte att betala tull om du landar på en motståndares kvarter — appen påminner dig efter varje drag, men det är upp till spelarna att göra det manuellt.</p>
-        <h2>Skattkistan</h2>
-        <p>Fickan och kistan är separata. Om fickan tar slut medan du bär en last: gå tillbaka till din Kung för $20 gratis — du behåller lasten.</p>
+        <p style="color:#ecc94b;">💡 Glöm inte att betala tull om du landar på en motståndares kvarter — appen påminner dig efter varje drag, men det är upp till er vid bordet att faktiskt göra det.</p>
+
+        <h2>Skattkistan & Fickan</h2>
+        <p>Fickan (kontanter du bär på dig, start $20) och Kistan (säkrade pengar i ditt Högkvarter) är två helt separata saldon som aldrig blandas ihop.</p>
+        <ul>
+            <li><strong>Hos din Kung:</strong> om du inte redan bär en last, hämtar du en skattkista för $1000 ur stadens kassa. Max en last åt gången.</li>
+            <li><strong>På väg till ditt Ess:</strong> om fickan sjunker mot $0 medan du bär en last, gå tillbaka till din Kung och ladda om fickan till $20 — helt gratis. Du behåller lasten, inga framsteg går förlorade.</li>
+            <li><strong>Hos ditt Ess:</strong> lämna av lasten i din kista. Kistan växer med $1000, och du kan ge dig ut på en ny runda.</li>
+        </ul>
+
         <h2>Regler för brädet</h2>
         <ul>
-            <li>Du får inte ställa dig på en motståndares knekt, bara passera.</li>
-            <li>Du får passera men inte stanna på en motståndares Kung eller Ess.</li>
-            <li>2-3 spelare: tull för en färg ingen äger går till stadens kassa.</li>
+            <li>Du får inte ställa dig på en motståndares knekt, bara passera över den.</li>
+            <li>Du får passera men aldrig stanna på en motståndares Kung eller Ess.</li>
+            <li>2-3 spelare: tull för en färg som ingen äger går till stadens kassa istället (via "Överför pengar" → Stadens kassa).</li>
         </ul>
-        <button class="popup-btn" onclick="window.NoirUI.closeRulesModal()">Stäng</button>
+
+        <h2>Regler för Gatuslagsmål 💥</h2>
+        <p>Landar din droska på en ruta där en motståndare redan står blir det gatuslagsmål på stubben! Tryck "Slagsmål" och välj motståndare.</p>
+        <ul>
+            <li>Båda slår varsin digital tärning.</li>
+            <li><strong>Vinst:</strong> vinnaren stjäl $10 direkt ur förlorarens ficka.</li>
+            <li><strong>Oavgjort:</strong> den som blev attackerad (försvararen) vinner.</li>
+            <li>Har förloraren mindre än $10 kvar i fickan tar vinnaren allt som finns, och förlorarens ficka laddas om till $20.</li>
+            <li>Förloraren flyttar sin fysiska droska tillbaka till antingen sitt Ess eller sin Kung — spelarens eget val.</li>
+        </ul>
+
+        <h2>Barerna (Damerna) 🥂</h2>
+        <p>Barerna är neutral, fredad mark. Du kan varken bli attackerad i ett slagsmål eller haffad av polisen där, och det är alltid gratis att landa på en Dam oavsett färg. Men det goda livet har sitt pris: du tappar fokus och måste <strong>stå över din nästa runda</strong>.</p>
+
+        <h2>Polisen (Knektar) & Arresteringar 🚨</h2>
+        <p>Poliserna rör sig ENDAST när du väljer det vid tärningsslag 5 eller 6, eller via händelsekortet "Mutor inom polisen". Landar din knekt på en motståndares droska blir den spelaren automatiskt haffad — appen frågar dig direkt efter flytten. Det finns ingen manuell "Haffad"-knapp längre, allt sköts av appen.</p>
+        <p>Straffet för den som grips:</p>
+        <ul>
+            <li><strong>HELA</strong> offrets fickinnehåll — oavsett belopp — går rakt in i din egen ficka.</li>
+            <li>Bar offret på en skattkista förlorar de den helt. Den försvinner spårlöst, går varken till staden eller någon annan spelare.</li>
+            <li>Offrets riktning återställs till "på väg till Kung", och fickan laddas om till $20.</li>
+        </ul>
+
+        <h2>Händelsekort 🎴</h2>
+        <p>Sex Noir-kort finns kvar i leken: Mutor inom polisen, Gatustrid, Razzia, Ekonomisk Kris, Genväg i gränden och Ficktjuv. De flesta är rent beskrivande text — läs och utför dem vid bordet på hedersord. Ett undantag: drar du <strong>Ficktjuv</strong> väljer du direkt i appen vilken motståndare du sno $10 ifrån (stadens kassa kan aldrig väljas).</p>
+
+        <h2>Betalningar & Stadens Kassa 🏛️</h2>
+        <p>Behöver du betala tull, böter eller annat till en motståndare — eller till staden, om du landar på en färg som ingen äger i ett 2-3-spelarparti — tryck "Överför pengar" på din panel och välj mottagare och belopp. Stadens kassa syns inte på skärmen men finns hela tiden i bakgrunden, och det är därifrån nya skattkistor betalas ut hos Kungarna.</p>
+
+        <button class="popup-btn" onclick="window.NoirUI.closeRulesModal()">Stäng och återgå till spelet</button>
     ` : `
-        <h1 style="color:#2b6cb0; text-align:center;">THE NOIR SYNDICATE v2 — RULES</h1>
+        <h1 style="color:#2b6cb0; text-align:center; letter-spacing: 2px;">THE NOIR SYNDICATE — RULES</h1>
+
+        <h2>Board Setup (Card Layout)</h2>
+        <p>Arrange the physical board using a standard deck of cards according to the image below. Core pattern: Aces in the corners, Kings along the edges, streets in between, and all Jacks (cops) start together at the precinct in the center. Every player places their token on their own Ace. Aces and Kings are fixed for the whole game and never move.</p>
+        <div class="setup-image-container"><img src="setup.PNG" alt="Setup"></div>
+        <p>Playing with 2 or 3 syndicates: the unused colors' Ace and King still sit on the table as usual — they're simply not in play tonight.</p>
+
         <h2>Objective</h2>
-        <p>Pick up $1000 cargo shipments from your King, carry them in your pocket to your Ace, and secure them in your vault. First to <strong>$${WINNING_VAULT}</strong> secured (3 shipments) wins.</p>
+        <p>You lead a crime syndicate in 1920s Chicago. Your job is to pick up contraband cash shipments — $1000 treasure chests — from your Boss (King), smuggle them through the city's dangerous streets, and stash them safely in your Headquarters (Ace). First to secure <strong>three full chests ($${WINNING_VAULT} total)</strong> in their vault takes over the city and wins.</p>
+
         <h2>Turn Order</h2>
-        <p>Only the active player may act. Roll, move your token, resolve any action, then tap "${R.btnNextPlayer}".</p>
+        <p>Only one player at a time controls the app — their name is shown in the turn banner up top. Roll the dice, move your token on the board, settle any business (pay rent, fights, etc.), then end your turn by tapping "${R.btnNextPlayer}". Turn order follows the board layout clockwise: <strong>Nightspades → Diamond → Crimson → Iron Clovers</strong>.</p>
+
         <h2>Dice Rule</h2>
         <ul>
             <li><strong>1-4:</strong> Move that many spaces.</li>
@@ -645,16 +699,52 @@ function buildRulesHtml(lang) {
             <li><strong>6:</strong> Move 4 spaces. Then choose: move your cop 2 steps, OR draw an event card.</li>
             <li>You may move forward, backward, or sideways — never diagonally (unless an event card says otherwise).</li>
         </ul>
-        <p style="color:#ecc94b;">💡 Don't forget to pay rent if you land on an opponent's quarter — the app reminds you after every move, but it's up to the players to handle it manually.</p>
-        <h2>The Vault</h2>
-        <p>Pocket cash and the vault are separate. If your pocket runs out while carrying cargo: return to your King for a free $20 refill — you keep the cargo.</p>
+        <p style="color:#ecc94b;">💡 Don't forget to pay rent if you land on an opponent's quarter — the app reminds you after every move, but it's on you at the table to actually do it.</p>
+
+        <h2>The Vault & Your Pocket</h2>
+        <p>Your Pocket (cash on hand, starts at $20) and your Vault (secured funds at HQ) are two completely separate balances that never mix.</p>
+        <ul>
+            <li><strong>At your King:</strong> if you're not already carrying cargo, pick up a $1000 shipment straight out of the city treasury. Max one shipment at a time.</li>
+            <li><strong>Heading to your Ace:</strong> if your pocket runs toward $0 while carrying cargo, head back to your King and refill your pocket to $20 — completely free. You keep the cargo, no progress lost.</li>
+            <li><strong>At your Ace:</strong> drop the cargo into your vault. Your vault grows by $1000, and you're ready to head out again.</li>
+        </ul>
+
         <h2>Board Rules</h2>
         <ul>
-            <li>You may not stop on an opponent's cop, only pass over.</li>
-            <li>You may pass but not stop on an opponent's King or Ace.</li>
-            <li>2-3 players: rent for an unowned color goes to the city treasury.</li>
+            <li>You may not stop on an opponent's cop, only pass over it.</li>
+            <li>You may pass but never stop on an opponent's King or Ace.</li>
+            <li>2-3 players: rent for an unowned color goes to the city treasury instead (via "Transfer Cash" → City Treasury).</li>
         </ul>
-        <button class="popup-btn" onclick="window.NoirUI.closeRulesModal()">Close</button>
+
+        <h2>Street Fight Rules 💥</h2>
+        <p>If your token lands on a square already held by an opponent, a street fight breaks out on the spot! Tap "Street Fight" and pick your opponent.</p>
+        <ul>
+            <li>Both roll a digital die.</li>
+            <li><strong>Victory:</strong> the winner steals $10 straight from the loser's pocket.</li>
+            <li><strong>Draw:</strong> the one who got attacked (the defender) wins.</li>
+            <li>If the loser has less than $10 left, the winner takes everything they have, and the loser's pocket is refilled to $20.</li>
+            <li>The loser moves their physical token back to either their Ace or their King — the player's own choice.</li>
+        </ul>
+
+        <h2>The Bars (Queens) 🥂</h2>
+        <p>Bars are neutral, safe ground. You can't be attacked in a fight or busted by the cops there, and landing on a Queen is always free regardless of color. But the high life comes at a price: you lose focus and must <strong>skip your next round</strong>.</p>
+
+        <h2>The Cops (Jacks) & Arrests 🚨</h2>
+        <p>Cops move ONLY when you choose to at a dice roll of 5 or 6, or via the "Police Bribery" event card. If your cop lands on an opponent's token, that player is automatically busted — the app asks you right after the move. There's no manual "Busted" button anymore, the app handles it all.</p>
+        <p>The penalty for whoever gets caught:</p>
+        <ul>
+            <li><strong>ALL</strong> of the victim's pocket cash — whatever the amount — goes straight into your own pocket.</li>
+            <li>If the victim was carrying a shipment, they lose it completely. It vanishes without a trace — it doesn't go to the city or any other player.</li>
+            <li>The victim's direction resets to "heading to King", and their pocket is refilled to $20.</li>
+        </ul>
+
+        <h2>Event Cards 🎴</h2>
+        <p>Six Noir cards remain in the deck: Police Bribery, Turf War, Police Raid, Economic Crash, Alleyway Shortcut, and Pickpocket. Most are purely descriptive — read them aloud and carry them out at the table on your honor. One exception: draw <strong>Pickpocket</strong> and you choose right in the app which opponent to steal $10 from (the city treasury can never be chosen).</p>
+
+        <h2>Payments & the City Treasury 🏛️</h2>
+        <p>Need to pay rent, a fine, or anything else to an opponent — or to the city, if you land on a color nobody owns in a 2-3 player game — tap "Transfer Cash" on your panel and pick a recipient and amount. The city treasury isn't shown on screen but is always ticking away in the background, and it's what pays out new shipments at the Kings.</p>
+
+        <button class="popup-btn" onclick="window.NoirUI.closeRulesModal()">Close and Resume Game</button>
     `;
 }
 
