@@ -15,7 +15,7 @@
 // klickas.
 // ============================================================
 
-import { getState, mutatePlayer, setActivePlayerId } from './state.js';
+import { getState, mutatePlayer, setActivePlayerId, clearEconomicCrisis } from './state.js';
 
 // ---- Kärnfråga: får denna spelare agera just nu? ----
 // Används av ui.js för att disabla/enabla knappar per spelarpanel,
@@ -65,6 +65,12 @@ export function advanceTurn() {
         nextIndex = (nextIndex + 1) % order.length;
         nextPlayerId = order[nextIndex];
         safetyCounter++;
+    }
+
+    // Ekonomisk Kris upphör när det blir samma spelares tur igen
+    // (den som drog kortet) — se ui.js där krisen sätts vid dragning.
+    if (state.economicCrisisDrawerId !== null && nextPlayerId === state.economicCrisisDrawerId) {
+        clearEconomicCrisis();
     }
 
     setActivePlayerId(nextPlayerId);
