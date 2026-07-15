@@ -281,6 +281,8 @@ button:disabled { opacity: 0.3; pointer-events: none; }
 .pay-grid select, .pay-grid input { width: 100%; background: #151515; border: 1px solid #262626; color: white; padding: 8px; border-radius: 4px; font-size: 14px; }
 .police-selector-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 15px; }
 .police-btn { text-align: left; padding: 12px; font-size: 13px; }
+.pay-target-btn.selected { border-color: #ecc94b; background: rgba(236, 201, 75, 0.15); color: #ecc94b; }
+#pay-amount-quick button { min-width: 44px; padding: 10px 4px; font-size: 13px; }
 
 .fight-dice-container { display: flex; justify-content: space-around; margin: 20px 0; gap: 15px; }
 .fight-dice-box { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; flex: 1; text-align: center; }
