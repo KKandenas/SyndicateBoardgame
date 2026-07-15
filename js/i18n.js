@@ -92,8 +92,9 @@ export const i18n = {
         // --- Betalning ---
         payHeader: "Skicka pengar",
         payRecipient: "Mottagare",
-        paySum: "Belopp ($)",
+        paySum: "Annat belopp ($)",
         payPayer: " betalar",
+        payQuickAmount: "Snabbval belopp",
 
         // --- Polis / arrestering ---
         policeTitle: "Vem blev gripen?",
@@ -206,8 +207,9 @@ export const i18n = {
 
         payHeader: "Send Money",
         payRecipient: "Recipient",
-        paySum: "Amount ($)",
+        paySum: "Custom amount ($)",
         payPayer: " pays",
+        payQuickAmount: "Quick amounts",
 
         policeTitle: "Who got caught?",
         policeSubtitle: "The pocket cash goes to your own pocket. The one caught returns to their King and loses any cargo.",
