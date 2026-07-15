@@ -338,10 +338,17 @@ button:disabled { opacity: 0.3; pointer-events: none; }
 .tab-btn.active[data-tab="4"] { color: var(--diamonds-color); background: rgba(236, 201, 75, 0.05); }
 .tab-btn span { font-size: 18px; }
 
-body.mode-iphone .game-container { display: flex; flex-direction: column; justify-content: flex-start; padding: 15px 15px 80px 15px; height: 100vh; gap: 15px; }
+body.mode-iphone .game-container {
+    display: flex; flex-direction: column; justify-content: flex-start;
+    padding: 15px 15px 90px 15px;
+    height: 100vh; height: 100dvh;
+    gap: 15px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
 body.mode-iphone .side-bar-left, body.mode-iphone .side-bar-right { display: none; }
 body.mode-iphone .center-console { order: -1; flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 10px; }
-body.mode-iphone .dice-wrapper { margin-top: 80px; }
+body.mode-iphone .dice-wrapper { margin-top: 50px; }
 body.mode-iphone .player-corner.active-tab { display: flex; }
 body.mode-iphone .stats-grid { margin: 10px 0; gap: 8px; }
 body.mode-iphone .stat-value { font-size: 18px; }
