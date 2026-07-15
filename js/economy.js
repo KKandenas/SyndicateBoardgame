@@ -110,9 +110,9 @@ export function dropCargoInVault(playerId) {
 
 // ---- Betalning mellan spelare (eller till stadsbanken) ----
 // recipientId kan vara ett spelar-id (1-4) eller CITY_BANK_RECIPIENT.
-// Används för tull, viten, eller manuella överföringar — precis som
-// "Överför pengar"-knappen i v1, men nu med stöd för att betala
-// stadsbanken direkt (regeln om oägd färg vid 2-3 spelare).
+// Används för tull, viten, eller manuella överföringar. Den AKTIVA
+// spelaren betalar FRÅN sin egen ficka TILL vald mottagare, med stöd
+// för att betala stadsbanken direkt (regeln om oägd färg vid 2-3 spelare).
 export function transferMoney(payerId, recipientId, amount) {
     assertCanAct(payerId);
 
@@ -149,4 +149,25 @@ export function getPaymentRecipients(payerId) {
         isCityBank: false
     }));
     return [...others, { id: CITY_BANK_RECIPIENT, isCityBank: true }];
+}
+
+// ---- Ficktjuv-händelsekortet ----
+// Regel: den aktiva spelaren väljer VILKEN motståndare pengarna tas
+// från (staden kan inte väljas — bara andra spelare). Tar $10, eller
+// hela offrets ficka om den innehåller mindre än $10.
+const PICKPOCKET_AMOUNT = 10;
+
+export function executePickpocket(activePlayerId, targetId) {
+    assertCanAct(activePlayerId);
+
+    const target = getPlayer(targetId);
+    const active = getPlayer(activePlayerId);
+    const stolen = Math.min(target.pocket, PICKPOCKET_AMOUNT);
+
+    if (stolen > 0) {
+        mutatePlayer(targetId, { pocket: target.pocket - stolen });
+        mutatePlayer(activePlayerId, { pocket: active.pocket + stolen });
+    }
+
+    return { stolen, targetId };
 }
