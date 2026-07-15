@@ -51,7 +51,6 @@ export const i18n = {
 
         // --- Ekonomiknappar ---
         actGetCargo: "Hämta last ($1000)",
-        actRefillPocket: "Ladda om ficka ($20)",
         actDropCargo: "Lämna last i kistan",
         actArrest: "Haffad",
         actFight: "Slagsmål",
@@ -65,7 +64,7 @@ export const i18n = {
         // --- Tärning 5/6-val (NYTT) ---
         copChoiceTitle: "Du slog en {roll}:a!",
         copChoice5Desc: "Du har två val: ① Flytta din knekt 1 steg, ELLER ② Dra ett händelsekort. Gör ditt val — sedan flyttar du din egen pjäs 4 steg.",
-        copChoice6Desc: "Du har två val: ① Flytta din knekt 2 steg, ELLER ② Dra ett händelsekort. Gör ditt val — sedan flyttar du din egen pjäs 4 steg.",
+        copChoice6Desc: "Du har tre val: ① Flytta din knekt 1 steg, ② Flytta din knekt 2 steg, ELLER ③ Dra ett händelsekort. Gör ditt val — sedan flyttar du din egen pjäs 4 steg.",
         copChoiceMove1: "👮 Flytta knekt 1 steg",
         copChoiceMove2: "👮 Flytta knekt 2 steg",
         copChoiceDrawEvent: "🎴 Dra ett händelsekort",
@@ -119,7 +118,9 @@ export const i18n = {
         alertCityBankEmpty: "Stadens kassa är tom just nu!",
         alertArrested: "{victim} greps av {cop}! Beslagtog ${loot}. {victim} går tillbaka till sin Kung med $20 i fickan.",
         alertJail: "{victim} greps, men hade inget extra att beslagta. Går tillbaka till sin Kung.",
-        alertBankrupt: "Fickan räcker inte! Fickan laddas om till $20 — din last (om du bär en) påverkas inte.",
+        alertBankruptToKing: "{name}s ficka är tom! Fickan laddas om till $20 — kistan påverkas inte. {name} går tillbaka till sin Kung.",
+        alertBankruptToAce: "{name}s ficka är tom! Fickan laddas om till $20 — kistan påverkas inte. {name} går tillbaka till sitt Ess.",
+        bankruptTitle: "💸 Fickan är tom!",
         alertReset: "Vill du nollställa spelet?",
         alertSkipTurn: "{name} landade på en Dam och står över nästa runda!",
         alertMustEndTurn: "Endast {name} kan agera just nu — det är deras tur.",
@@ -174,7 +175,6 @@ export const i18n = {
         turnStepEnd: "3. Done? Tap Next Player",
 
         actGetCargo: "Pick Up Cargo ($1000)",
-        actRefillPocket: "Refill Pocket ($20)",
         actDropCargo: "Drop Cargo in Vault",
         actArrest: "Busted",
         actFight: "Street Fight",
@@ -186,7 +186,7 @@ export const i18n = {
 
         copChoiceTitle: "You rolled a {roll}!",
         copChoice5Desc: "You have two choices: ① Move your cop 1 step, OR ② Draw an event card. Make your choice — then move your own token 4 steps.",
-        copChoice6Desc: "You have two choices: ① Move your cop 2 steps, OR ② Draw an event card. Make your choice — then move your own token 4 steps.",
+        copChoice6Desc: "You have three choices: ① Move your cop 1 step, ② Move your cop 2 steps, OR ③ Draw an event card. Make your choice — then move your own token 4 steps.",
         copChoiceMove1: "👮 Move cop 1 step",
         copChoiceMove2: "👮 Move cop 2 steps",
         copChoiceDrawEvent: "🎴 Draw an event card",
@@ -234,7 +234,9 @@ export const i18n = {
         alertCityBankEmpty: "The city treasury is empty right now!",
         alertArrested: "{victim} busted by {cop}! Confiscated ${loot}. {victim} returns to their King with $20 pocket cash.",
         alertJail: "{victim} busted, but had nothing extra to confiscate. Returns to their King.",
-        alertBankrupt: "Pocket cash ran out! Pocket refilled to $20 — your cargo (if any) is unaffected.",
+        alertBankruptToKing: "{name}'s pocket is empty! Pocket refilled to $20 — the vault is unaffected. {name} returns to their King.",
+        alertBankruptToAce: "{name}'s pocket is empty! Pocket refilled to $20 — the vault is unaffected. {name} returns to their Ace.",
+        bankruptTitle: "💸 Pocket Empty!",
         alertReset: "Reset the game?",
         alertSkipTurn: "{name} landed on a Queen and skips the next round!",
         alertMustEndTurn: "Only {name} can act right now — it's their turn.",
