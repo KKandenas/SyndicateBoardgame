@@ -66,7 +66,9 @@ let state = {
     language: 'sv',
     deviceMode: null,             // 'ipad' | 'iphone'
     lastDiceRoll: null,
-    pendingCopMove: null          // se movement.js — håller reda på om ett knektval väntar
+    pendingCopMove: null,        // se movement.js — håller reda på om ett knektval väntar
+    economicCrisisDrawerId: null // NYTT: satt till spelar-id när "Ekonomisk Kris" dras,
+                                  // rensas när det blir samma spelares tur igen (se turnOrder.js)
 };
 
 // ---- Pub/sub så UI kan reagera på ändringar utan tight koppling ----
@@ -146,6 +148,19 @@ export function setPendingCopMove(data) {
     notify();
 }
 
+// Ekonomisk Kris-händelsekortet: dubbel tull tills det blir samma
+// spelares (drawerId:s) tur igen. Rensas automatiskt av advanceTurn()
+// i turnOrder.js när den vändan kommer runt.
+export function setEconomicCrisis(drawerId) {
+    state.economicCrisisDrawerId = drawerId;
+    notify();
+}
+
+export function clearEconomicCrisis() {
+    state.economicCrisisDrawerId = null;
+    notify();
+}
+
 export function setLanguage(lang) {
     state.language = lang;
     notify();
@@ -183,5 +198,6 @@ export function resetGame() {
     state.winnerId = null;
     state.lastDiceRoll = null;
     state.pendingCopMove = null;
+    state.economicCrisisDrawerId = null;
     setupPlayerCount(previousCount); // notify() körs i setupPlayerCount
 }
