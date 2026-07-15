@@ -399,10 +399,11 @@ export function openPayModal(id) {
     qs('pay-title').innerText = gangName(id) + t('payPayer');
 
     const recipients = getPaymentRecipients(id);
-    selectedPayTargetId = recipients.length ? recipients[0].id : null;
+    selectedPayTargetId = null; // ingen mottagare förvald — måste väljas aktivt
 
     renderPayTargetButtons(recipients);
     renderPayAmountQuickButtons();
+    qs('pay-amount').value = '';
     showOverlay('pay-overlay');
 }
 
@@ -425,8 +426,8 @@ function renderPayTargetButtons(recipients) {
 }
 
 // Snabbvalsknappar $2-$10 — täcker alla möjliga korttullar (2-10 i
-// en vanlig kortlek). Klick exekverar betalningen direkt, ingen
-// extra bekräftelse behövs för dessa vanliga belopp.
+// en vanlig kortlek). Klick fyller bara i beloppsfältet — man måste
+// fortfarande trycka "Bekräfta" för att faktiskt genomföra betalningen.
 function renderPayAmountQuickButtons() {
     const container = qs('pay-amount-quick');
     container.innerHTML = '';
@@ -435,18 +436,9 @@ function renderPayAmountQuickButtons() {
         btn.className = 'btn-success';
         btn.style.flex = '1 1 17%';
         btn.innerText = `$${amount}`;
-        btn.onclick = () => executePayment(amount);
+        btn.onclick = () => { qs('pay-amount').value = amount; };
         container.appendChild(btn);
     }
-}
-
-function executePayment(amount) {
-    if (selectedPayTargetId === null) return;
-    const res = transferMoney(activePayerId, selectedPayTargetId, amount);
-    if (res.result === EconomyResult.BANKRUPT) {
-        toast(t('alertBankrupt'), 'danger');
-    }
-    closePayModal();
 }
 
 export function closePayModal() {
@@ -455,10 +447,21 @@ export function closePayModal() {
     selectedPayTargetId = null;
 }
 
-// Kvarvarande manuellt fält för belopp utanför $2-$10.
 export function executePaymentFromModal() {
+    if (selectedPayTargetId === null) {
+        toast(t('alertPickRecipient'), 'danger');
+        return;
+    }
     const amount = parseInt(qs('pay-amount').value, 10);
-    executePayment(amount);
+    if (!Number.isFinite(amount) || amount <= 0) {
+        toast(t('alertPickAmount'), 'danger');
+        return;
+    }
+    const res = transferMoney(activePayerId, selectedPayTargetId, amount);
+    if (res.result === EconomyResult.BANKRUPT) {
+        toast(t('alertBankrupt'), 'danger');
+    }
+    closePayModal();
 }
 
 // ▶ SEKTION: Arrestering
