@@ -31,7 +31,7 @@ import { isActionAllowed, getCurrentTurnPlayerId, advanceTurn } from './turnOrde
 import { performRoll, getDotsForValue } from './dice.js';
 import { resolveDiceRoll, resolveCopChoice, COP_CHOICE } from './movement.js';
 import { drawRandomEvent } from './events.js';
-import { getCargo, refillPocketAtKing, dropCargoInVault, transferMoney, getPaymentRecipients, executePickpocket, EconomyResult } from './economy.js';
+import { getCargo, dropCargoInVault, transferMoney, getPaymentRecipients, executePickpocket, EconomyResult } from './economy.js';
 import { resolveFight } from './combat.js';
 import { executeArrestFromCopMove, ArrestResult } from './arrest.js';
 
@@ -45,6 +45,7 @@ let currentActiveEventIndex = null;
 let pendingDiceSteps = null;   // hur många steg huvudpjäsen ska gå, väntar på att annonseras
 let copFlowContext = null;     // håller reda på var i 5:an/6:an-kedjan vi befinner oss
 let pendingPickpocket = false; // true = det aktuella händelsekortet är Ficktjuv, kräver målval
+let lastFightBankruptLoserId = null; // sätts av finishStreetFight, triggar bankrutt-popup vid stängning
 
 // ▶ SEKTION: Hjälpfunktioner
 function qs(id) { return document.getElementById(id); }
@@ -119,13 +120,11 @@ function renderPlayerPanel(id) {
         badge.className = 'direction-badge ' + (player.direction === DIRECTION.TO_KING ? 'dir-king' : 'dir-ace');
     }
 
-    // Kontextuella last-knappar: bara EN av de tre är synlig åt gången.
+    // Kontextuella last-knappar: bara EN av de två är synlig åt gången.
     const btnGetCargo = qs(`p${id}-btn-get-cargo`);
-    const btnRefill = qs(`p${id}-btn-refill`);
     const btnDropCargo = qs(`p${id}-btn-drop-cargo`);
-    if (btnGetCargo && btnRefill && btnDropCargo) {
+    if (btnGetCargo && btnDropCargo) {
         btnGetCargo.style.display = (!player.hasCargo) ? 'flex' : 'none';
-        btnRefill.style.display = (player.hasCargo && player.pocket < 20) ? 'flex' : 'none';
         btnDropCargo.style.display = (player.hasCargo) ? 'flex' : 'none';
     }
 
@@ -384,11 +383,6 @@ export function handleGetCargo(playerId) {
     if (res.result === EconomyResult.ALREADY_CARRYING) toast(t('alertAlreadyCarrying'), 'danger');
 }
 
-export function handleRefillPocket(playerId) {
-    const res = refillPocketAtKing(playerId);
-    if (res.result === EconomyResult.OK) toast('$20', 'success');
-}
-
 export function handleDropCargo(playerId) {
     const res = dropCargoInVault(playerId);
     if (res.result === EconomyResult.NO_CARGO_TO_DROP) toast(t('alertNoCargoToDrop'), 'danger');
@@ -473,10 +467,29 @@ export function executePaymentFromModal() {
         return;
     }
     const res = transferMoney(activePayerId, selectedPayTargetId, amount);
-    if (res.result === EconomyResult.BANKRUPT) {
-        toast(t('alertBankrupt'), 'danger');
-    }
+    const payerId = activePayerId;
     closePayModal();
+    if (res.result === EconomyResult.BANKRUPT) {
+        showBankruptPopup(payerId);
+    }
+}
+
+// ▶ SEKTION: Bankrutt-popup (NYTT)
+// Visas när en spelares ficka töms av NÅGON anledning (misslyckad
+// betalning här, eller ett slagsmåls "pity"-regel — se combat.js).
+// Blockerar tills spelaren trycker "Uppfattat", till skillnad från
+// en vanlig toast, eftersom det är viktig information att inte missa.
+// Destinationen (Kung eller Ess) styrs av spelarens riktning vid
+// tillfället — samma princip som slagsmålsförlorarens destination.
+export function showBankruptPopup(playerId) {
+    const direction = getPlayer(playerId).direction;
+    const key = direction === DIRECTION.TO_ACE ? 'alertBankruptToKing' : 'alertBankruptToAce';
+    qs('bankrupt-message').innerText = interpolate(t(key), { name: gangName(playerId) });
+    showOverlay('bankrupt-overlay');
+}
+
+export function closeBankruptPopup() {
+    hideOverlay('bankrupt-overlay');
 }
 
 // ▶ SEKTION: Arrestering
@@ -523,6 +536,7 @@ export function closePoliceModal() {
 export function openFightModal(id) {
     if (isFighting) return;
     activeAttackerId = id;
+    lastFightBankruptLoserId = null;
     qs('fight-setup-view').style.display = 'block';
     qs('fight-rolling-view').style.display = 'none';
 
@@ -541,6 +555,11 @@ export function openFightModal(id) {
 export function closeFightModal() {
     if (isFighting) return;
     hideOverlay('fight-overlay');
+    if (lastFightBankruptLoserId !== null) {
+        const loserId = lastFightBankruptLoserId;
+        lastFightBankruptLoserId = null;
+        showBankruptPopup(loserId);
+    }
 }
 
 function startStreetFight(defenderId) {
@@ -579,6 +598,7 @@ function finishStreetFight(defenderId, statusLabel) {
     statusLabel.style.borderColor = '';
 
     if (res.loserWentBankrupt) {
+        lastFightBankruptLoserId = res.loserId;
         statusLabel.style.backgroundColor = 'rgba(229, 62, 62, 0.2)';
         statusLabel.style.color = '#f56565';
         statusLabel.style.borderColor = '#e53e3e';
@@ -691,7 +711,7 @@ function buildRulesHtml(lang) {
         <ul>
             <li><strong>1-4:</strong> Gå så många steg tärningen visar.</li>
             <li><strong>5:</strong> Välj FÖRST: flytta din knekt 1 steg, ELLER dra ett händelsekort. Gå SEDAN 4 steg med din egen droska.</li>
-            <li><strong>6:</strong> Välj FÖRST: flytta din knekt 2 steg, ELLER dra ett händelsekort. Gå SEDAN 4 steg med din egen droska.</li>
+            <li><strong>6:</strong> Välj FÖRST: flytta din knekt 1 steg, ELLER 2 steg, ELLER dra ett händelsekort. Gå SEDAN 4 steg med din egen droska.</li>
             <li>Du får gå framåt, bakåt eller i sidled — aldrig diagonalt (om inte ett händelsekort säger annat).</li>
             <li>Du måste alltid gå <strong>hela</strong> antalet steg. Undantag: om du inte kan gå längre (blockerad), eller om du når fram till din egen Kung eller ditt eget Ess innan stegen är slut — då stannar du där direkt, oavsett hur många steg som återstår.</li>
             <li>Du får inte backa till ett kort du redan passerat tidigare under samma drag.</li>
@@ -701,9 +721,9 @@ function buildRulesHtml(lang) {
         <h2>Skattkistan & Fickan</h2>
         <p>Fickan (kontanter du bär på dig, start $20) och Kistan (säkrade pengar i ditt Högkvarter) är två helt separata saldon som aldrig blandas ihop.</p>
         <ul>
-            <li><strong>Hos din Kung:</strong> om du inte redan bär en last, hämtar du en skattkista för $1000 ur stadens kassa. Max en last åt gången.</li>
-            <li><strong>På väg till ditt Ess:</strong> om fickan sjunker mot $0 medan du bär en last, gå tillbaka till din Kung och ladda om fickan till $20 — helt gratis. Du behåller lasten, inga framsteg går förlorade.</li>
+            <li><strong>Hos din Kung:</strong> om du inte redan bär en last, hämtar du en skattkista för $1000 ur stadens kassa. Max en last åt gången. Fickan påverkas inte av detta — du behåller precis det du redan har, oavsett belopp.</li>
             <li><strong>Hos ditt Ess:</strong> lämna av lasten i din kista. Kistan växer med $1000, och du kan ge dig ut på en ny runda.</li>
+            <li>Om fickan skulle ta slut helt (av valfri anledning) visar appen en tydlig popup som du måste bekräfta — fickan laddas då om till $20, och du går tillbaka till ditt Ess eller din Kung beroende på vilken riktning du var på väg.</li>
         </ul>
 
         <h2>Regler för brädet</h2>
@@ -764,7 +784,7 @@ function buildRulesHtml(lang) {
         <ul>
             <li><strong>1-4:</strong> Move that many spaces.</li>
             <li><strong>5:</strong> Choose FIRST: move your cop 1 step, OR draw an event card. THEN move your own token 4 spaces.</li>
-            <li><strong>6:</strong> Choose FIRST: move your cop 2 steps, OR draw an event card. THEN move your own token 4 spaces.</li>
+            <li><strong>6:</strong> Choose FIRST: move your cop 1 step, OR 2 steps, OR draw an event card. THEN move your own token 4 spaces.</li>
             <li>You may move forward, backward, or sideways — never diagonally (unless an event card says otherwise).</li>
             <li>You must always move the <strong>full</strong> number of spaces. Exceptions: if you can't move further (blocked), or if you reach your own King or Ace before the spaces run out — then you stop there immediately, no matter how many spaces remain.</li>
             <li>You may not backtrack onto a card you already passed earlier in the same move.</li>
@@ -774,9 +794,9 @@ function buildRulesHtml(lang) {
         <h2>The Vault & Your Pocket</h2>
         <p>Your Pocket (cash on hand, starts at $20) and your Vault (secured funds at HQ) are two completely separate balances that never mix.</p>
         <ul>
-            <li><strong>At your King:</strong> if you're not already carrying cargo, pick up a $1000 shipment straight out of the city treasury. Max one shipment at a time.</li>
-            <li><strong>Heading to your Ace:</strong> if your pocket runs toward $0 while carrying cargo, head back to your King and refill your pocket to $20 — completely free. You keep the cargo, no progress lost.</li>
+            <li><strong>At your King:</strong> if you're not already carrying cargo, pick up a $1000 shipment straight out of the city treasury. Max one shipment at a time. Your pocket is untouched by this — you keep exactly what you already had, whatever the amount.</li>
             <li><strong>At your Ace:</strong> drop the cargo into your vault. Your vault grows by $1000, and you're ready to head out again.</li>
+            <li>If your pocket ever runs completely dry (for any reason), the app shows a clear popup you must acknowledge — your pocket is refilled to $20, and you return to your Ace or King depending on which direction you were heading.</li>
         </ul>
 
         <h2>Board Rules</h2>
