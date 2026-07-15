@@ -9,9 +9,9 @@
 //   - "Lasten" är en skattkista värd $1000, skild från fickpengar.
 //     Hämtas hos Kungen (kostar $1000 ur cityBank), lämnas i kistan
 //     (vault) hos Esset. Max en last i taget (oförändrat från v1).
-//   - Om fickan tar slut MEDAN man bär en last: fickan laddas om
-//     till $20 genom att gå tillbaka till Kungen. Lasten/kistan
-//     påverkas INTE — inga framsteg går förlorade.
+//     Fickpengarna påverkas ALDRIG av att hämta/lämna last — spelaren
+//     behåller det de har i fickan oavsett (ingen separat "ladda om
+//     ficka"-knapp längre, playtest-beslut).
 //   - Betalningar mellan spelare kan även gå till stadsbanken
 //     direkt (används när man landar på en färg ingen äger, i
 //     spel med färre än 4 spelare).
@@ -68,24 +68,6 @@ export function getCargo(playerId) {
         direction: DIRECTION.TO_ACE
     });
 
-    return { result: EconomyResult.OK };
-}
-
-// ---- Ladda om fickan hos Kungen (medan man bär last) ----
-// Regel (bekräftad): om fickan tar slut på väg till Esset går man
-// tillbaka till Kungen och får $20 — gratis, kistan/lasten påverkas
-// inte, och man behåller sin plats i framstegen mot vinst.
-export function refillPocketAtKing(playerId) {
-    assertCanAct(playerId);
-    const player = getPlayer(playerId);
-
-    if (!player.hasCargo) {
-        // Inget fel i sig, men det finns inget att "ladda om för" —
-        // ui.js bör bara visa denna knapp när hasCargo är true.
-        return { result: EconomyResult.NO_CARGO_TO_DROP };
-    }
-
-    mutatePlayer(playerId, { pocket: START_POCKET });
     return { result: EconomyResult.OK };
 }
 
