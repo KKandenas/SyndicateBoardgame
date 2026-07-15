@@ -31,7 +31,7 @@ import { isActionAllowed, getCurrentTurnPlayerId, advanceTurn } from './turnOrde
 import { performRoll, getDotsForValue } from './dice.js';
 import { resolveDiceRoll, resolveCopChoice, COP_CHOICE } from './movement.js';
 import { drawRandomEvent } from './events.js';
-import { getCargo, refillPocketAtKing, dropCargoInVault, transferMoney, getPaymentRecipients, executePickpocket, CITY_BANK_RECIPIENT, EconomyResult } from './economy.js';
+import { getCargo, refillPocketAtKing, dropCargoInVault, transferMoney, getPaymentRecipients, executePickpocket, EconomyResult } from './economy.js';
 import { resolveFight } from './combat.js';
 import { executeArrestFromCopMove, ArrestResult } from './arrest.js';
 
@@ -39,6 +39,7 @@ import { executeArrestFromCopMove, ArrestResult } from './arrest.js';
 let isRolling = false;
 let isFighting = false;
 let activePayerId = null;
+let selectedPayTargetId = null; // vald mottagare i betalningsmodalen (spelar-id eller CITY_BANK_RECIPIENT)
 let activeAttackerId = null;
 let currentActiveEventIndex = null;
 let pendingDiceSteps = null;   // hur många steg huvudpjäsen ska gå, väntar på att annonseras
@@ -396,31 +397,68 @@ export function handleDropCargo(playerId) {
 export function openPayModal(id) {
     activePayerId = id;
     qs('pay-title').innerText = gangName(id) + t('payPayer');
-    const select = qs('pay-target');
-    select.innerHTML = '';
-    getPaymentRecipients(id).forEach(recipient => {
-        const opt = document.createElement('option');
-        opt.value = recipient.id;
-        opt.innerText = recipient.isCityBank ? t('statCityBank') : gangName(recipient.id);
-        select.appendChild(opt);
-    });
+
+    const recipients = getPaymentRecipients(id);
+    selectedPayTargetId = recipients.length ? recipients[0].id : null;
+
+    renderPayTargetButtons(recipients);
+    renderPayAmountQuickButtons();
     showOverlay('pay-overlay');
+}
+
+// Bygger mottagarknapparna. Ritas om vid varje val så den markerade
+// knappen (guld ram) alltid matchar selectedPayTargetId.
+function renderPayTargetButtons(recipients) {
+    const grid = qs('pay-target-grid');
+    grid.innerHTML = '';
+    recipients.forEach(r => {
+        const btn = document.createElement('button');
+        btn.className = 'police-btn pay-target-btn';
+        if (r.id === selectedPayTargetId) btn.classList.add('selected');
+        btn.innerText = r.isCityBank ? t('statCityBank') : gangName(r.id);
+        btn.onclick = () => {
+            selectedPayTargetId = r.id;
+            renderPayTargetButtons(recipients);
+        };
+        grid.appendChild(btn);
+    });
+}
+
+// Snabbvalsknappar $2-$10 — täcker alla möjliga korttullar (2-10 i
+// en vanlig kortlek). Klick exekverar betalningen direkt, ingen
+// extra bekräftelse behövs för dessa vanliga belopp.
+function renderPayAmountQuickButtons() {
+    const container = qs('pay-amount-quick');
+    container.innerHTML = '';
+    for (let amount = 2; amount <= 10; amount++) {
+        const btn = document.createElement('button');
+        btn.className = 'btn-success';
+        btn.style.flex = '1 1 17%';
+        btn.innerText = `$${amount}`;
+        btn.onclick = () => executePayment(amount);
+        container.appendChild(btn);
+    }
+}
+
+function executePayment(amount) {
+    if (selectedPayTargetId === null) return;
+    const res = transferMoney(activePayerId, selectedPayTargetId, amount);
+    if (res.result === EconomyResult.BANKRUPT) {
+        toast(t('alertBankrupt'), 'danger');
+    }
+    closePayModal();
 }
 
 export function closePayModal() {
     hideOverlay('pay-overlay');
     activePayerId = null;
+    selectedPayTargetId = null;
 }
 
+// Kvarvarande manuellt fält för belopp utanför $2-$10.
 export function executePaymentFromModal() {
-    const targetRaw = qs('pay-target').value;
-    const targetId = targetRaw === CITY_BANK_RECIPIENT ? CITY_BANK_RECIPIENT : Number(targetRaw);
     const amount = parseInt(qs('pay-amount').value, 10);
-    const res = transferMoney(activePayerId, targetId, amount);
-    if (res.result === EconomyResult.BANKRUPT) {
-        toast(t('alertBankrupt'), 'danger');
-    }
-    closePayModal();
+    executePayment(amount);
 }
 
 // ▶ SEKTION: Arrestering
