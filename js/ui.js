@@ -621,7 +621,7 @@ function buildRulesHtml(lang) {
         <h1 style="color:#2b6cb0; text-align:center; letter-spacing: 2px;">THE NOIR SYNDICATE — REGLER</h1>
 
         <h2>Spelplan & Setup (Kortlayout)</h2>
-        <p>Bygg upp spelplanen på bordet med en vanlig kortlek enligt bilden nedan. Grundmönstret: Ess i hörnen, Kungar på kanterna, gator däremellan, och samtliga Knektar (poliser) startar samlade på polisstationen i mitten. Varje spelare placerar sin droska på sitt eget Ess. Ess och Kung ligger fast hela spelet och flyttas aldrig.</p>
+        <p>Bygg upp spelplanen på bordet med en vanlig kortlek enligt bilden nedan. Grundmönstret: Ess i hörnen, Kungar på kanterna, gator däremellan, och samtliga Knektar (poliser) startar samlade på polisstationen i mitten. <strong>Alla övriga kort — allt utom Ess, Kung och Knekt — läggs upp och ner (dolda) på sina platser innan spelet börjar.</strong> Varje spelare placerar sin droska på sitt eget Ess. Ess och Kung ligger fast hela spelet och flyttas aldrig.</p>
         <div class="setup-image-container"><img src="setup.PNG" alt="Setup"></div>
         <p>Spelar ni 2 eller 3 syndikat: de oanvända färgernas Ess och Kung ligger ändå kvar på bordet som vanligt — de är helt enkelt inte i spel den här kvällen.</p>
 
@@ -637,6 +637,8 @@ function buildRulesHtml(lang) {
             <li><strong>5:</strong> Välj FÖRST: flytta din knekt 1 steg, ELLER dra ett händelsekort. Gå SEDAN 4 steg med din egen droska.</li>
             <li><strong>6:</strong> Välj FÖRST: flytta din knekt 2 steg, ELLER dra ett händelsekort. Gå SEDAN 4 steg med din egen droska.</li>
             <li>Du får gå framåt, bakåt eller i sidled — aldrig diagonalt (om inte ett händelsekort säger annat).</li>
+            <li>Du måste alltid gå <strong>hela</strong> antalet steg. Undantag: om du inte kan gå längre (blockerad), eller om du når fram till din egen Kung eller ditt eget Ess innan stegen är slut — då stannar du där direkt, oavsett hur många steg som återstår.</li>
+            <li>Du får inte backa till ett kort du redan passerat tidigare under samma drag.</li>
         </ul>
         <p style="color:#ecc94b;">💡 Glöm inte att betala tull om du landar på en motståndares kvarter — appen påminner dig efter varje drag, men det är upp till er vid bordet att faktiskt göra det.</p>
 
@@ -652,6 +654,9 @@ function buildRulesHtml(lang) {
         <ul>
             <li>Du får inte passera över en motståndares knekt — hitta en annan väg.</li>
             <li>Du får passera men aldrig stanna på en motståndares Kung eller Ess.</li>
+            <li>Landar du på ett <strong>dolt (upp-och-nervänt) kort</strong> vänds det upp direkt, och du betalar tull som vanligt utifrån kortets värde.</li>
+            <li>Landar du på ett redan <strong>öppet kvarter</strong> betalar du tull till den spelare som äger den färgen.</li>
+            <li>Landar du på ett kort av <strong>din egen färg</strong> är det alltid gratis — men kortet vänds ändå upp om det låg dolt.</li>
             <li><strong>Tullens storlek styrs av kortets eget värde:</strong> landar du t.ex. på Spader 5 betalar du $5 till Nightspades, landar du på Ruter 9 betalar du $9 till Diamond, och så vidare.</li>
             <li>2-3 spelare: tull för en färg som ingen äger går till stadens kassa istället (via "Överför pengar" → Stadens kassa).</li>
         </ul>
@@ -689,7 +694,7 @@ function buildRulesHtml(lang) {
         <h1 style="color:#2b6cb0; text-align:center; letter-spacing: 2px;">THE NOIR SYNDICATE — RULES</h1>
 
         <h2>Board Setup (Card Layout)</h2>
-        <p>Arrange the physical board using a standard deck of cards according to the image below. Core pattern: Aces in the corners, Kings along the edges, streets in between, and all Jacks (cops) start together at the precinct in the center. Every player places their token on their own Ace. Aces and Kings are fixed for the whole game and never move.</p>
+        <p>Arrange the physical board using a standard deck of cards according to the image below. Core pattern: Aces in the corners, Kings along the edges, streets in between, and all Jacks (cops) start together at the precinct in the center. <strong>Every other card — everything except Aces, Kings, and Jacks — is placed face-down on its spot before play begins.</strong> Every player places their token on their own Ace. Aces and Kings are fixed for the whole game and never move.</p>
         <div class="setup-image-container"><img src="setup.PNG" alt="Setup"></div>
         <p>Playing with 2 or 3 syndicates: the unused colors' Ace and King still sit on the table as usual — they're simply not in play tonight.</p>
 
@@ -705,6 +710,8 @@ function buildRulesHtml(lang) {
             <li><strong>5:</strong> Choose FIRST: move your cop 1 step, OR draw an event card. THEN move your own token 4 spaces.</li>
             <li><strong>6:</strong> Choose FIRST: move your cop 2 steps, OR draw an event card. THEN move your own token 4 spaces.</li>
             <li>You may move forward, backward, or sideways — never diagonally (unless an event card says otherwise).</li>
+            <li>You must always move the <strong>full</strong> number of spaces. Exceptions: if you can't move further (blocked), or if you reach your own King or Ace before the spaces run out — then you stop there immediately, no matter how many spaces remain.</li>
+            <li>You may not backtrack onto a card you already passed earlier in the same move.</li>
         </ul>
         <p style="color:#ecc94b;">💡 Don't forget to pay rent if you land on an opponent's quarter — the app reminds you after every move, but it's on you at the table to actually do it.</p>
 
@@ -720,6 +727,9 @@ function buildRulesHtml(lang) {
         <ul>
             <li>You may not pass over an opponent's cop — you'll have to find another way around.</li>
             <li>You may pass but never stop on an opponent's King or Ace.</li>
+            <li>Land on a <strong>face-down card</strong> and it's flipped up immediately — pay rent as usual, based on the card's value.</li>
+            <li>Land on an already <strong>face-up quarter</strong> and you pay rent to whichever player owns that color.</li>
+            <li>Land on a card of <strong>your own color</strong> and it's always free — though the card still gets flipped up if it was face-down.</li>
             <li><strong>Rent is set by the card's own value:</strong> land on Spades 5, pay $5 to Nightspades. Land on Diamonds 9, pay $9 to Diamond, and so on.</li>
             <li>2-3 players: rent for an unowned color goes to the city treasury instead (via "Transfer Cash" → City Treasury).</li>
         </ul>
