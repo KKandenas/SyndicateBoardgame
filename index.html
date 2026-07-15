@@ -75,7 +75,6 @@
             </div>
             <div class="gang-actions">
                 <button id="p1-btn-get-cargo" class="btn-success btn-cargo-action" onclick="window.NoirUI.handleGetCargo(1)">💰 <span data-key="actGetCargo">Hämta last</span></button>
-                <button id="p1-btn-refill" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleRefillPocket(1)">🔄 <span data-key="actRefillPocket">Ladda om ficka</span></button>
                 <button id="p1-btn-drop-cargo" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleDropCargo(1)">👑 <span data-key="actDropCargo">Lämna last</span></button>
                 <button onclick="window.NoirUI.openFightModal(1)" class="btn-fight">💥 <span data-key="actFight">Slagsmål</span></button>
                 <button onclick="window.NoirUI.openPayModal(1)" class="btn-pay">💸 <span data-key="actPay">Överför pengar ➔</span></button>
@@ -101,7 +100,6 @@
             </div>
             <div class="gang-actions">
                 <button id="p4-btn-get-cargo" class="btn-success btn-cargo-action" onclick="window.NoirUI.handleGetCargo(4)">💰 <span data-key="actGetCargo">Hämta last</span></button>
-                <button id="p4-btn-refill" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleRefillPocket(4)">🔄 <span data-key="actRefillPocket">Ladda om ficka</span></button>
                 <button id="p4-btn-drop-cargo" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleDropCargo(4)">👑 <span data-key="actDropCargo">Lämna last</span></button>
                 <button onclick="window.NoirUI.openFightModal(4)" class="btn-fight">💥 <span data-key="actFight">Slagsmål</span></button>
                 <button onclick="window.NoirUI.openPayModal(4)" class="btn-pay">💸 <span data-key="actPay">Överför pengar ➔</span></button>
@@ -148,7 +146,6 @@
             </div>
             <div class="gang-actions">
                 <button id="p3-btn-get-cargo" class="btn-success btn-cargo-action" onclick="window.NoirUI.handleGetCargo(3)">💰 <span data-key="actGetCargo">Hämta last</span></button>
-                <button id="p3-btn-refill" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleRefillPocket(3)">🔄 <span data-key="actRefillPocket">Ladda om ficka</span></button>
                 <button id="p3-btn-drop-cargo" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleDropCargo(3)">👑 <span data-key="actDropCargo">Lämna last</span></button>
                 <button onclick="window.NoirUI.openFightModal(3)" class="btn-fight">💥 <span data-key="actFight">Slagsmål</span></button>
                 <button onclick="window.NoirUI.openPayModal(3)" class="btn-pay">💸 <span data-key="actPay">Överför pengar ➔</span></button>
@@ -174,7 +171,6 @@
             </div>
             <div class="gang-actions">
                 <button id="p2-btn-get-cargo" class="btn-success btn-cargo-action" onclick="window.NoirUI.handleGetCargo(2)">💰 <span data-key="actGetCargo">Hämta last</span></button>
-                <button id="p2-btn-refill" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleRefillPocket(2)">🔄 <span data-key="actRefillPocket">Ladda om ficka</span></button>
                 <button id="p2-btn-drop-cargo" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleDropCargo(2)">👑 <span data-key="actDropCargo">Lämna last</span></button>
                 <button onclick="window.NoirUI.openFightModal(2)" class="btn-fight">💥 <span data-key="actFight">Slagsmål</span></button>
                 <button onclick="window.NoirUI.openPayModal(2)" class="btn-pay">💸 <span data-key="actPay">Överför pengar ➔</span></button>
@@ -217,6 +213,15 @@
             <div class="popup-desc" data-key="copLandedDesc">Om din polis landade på en motståndares pjäs blir denne haffad direkt.</div>
             <button class="popup-btn" id="cop-landed-yes-btn" data-key="copLandedYes" style="background:#9c2b2b;">Ja, haffa spelaren</button>
             <button class="popup-btn" id="cop-landed-no-btn" data-key="copLandedNo" style="background:#1a1a1a; margin-top:8px;">Nej, gå vidare</button>
+        </div>
+    </div>
+
+    <!-- NYTT v2: Blockerande popup när en spelares ficka töms av någon anledning -->
+    <div class="overlay" id="bankrupt-overlay">
+        <div class="popup" style="border-color:#e53e3e;">
+            <div class="popup-title" style="color:#e53e3e;" data-key="bankruptTitle">💸 Fickan är tom!</div>
+            <div class="popup-desc" id="bankrupt-message"></div>
+            <button class="popup-btn" onclick="window.NoirUI.closeBankruptPopup()" data-key="btnOk">Uppfattat</button>
         </div>
     </div>
 
