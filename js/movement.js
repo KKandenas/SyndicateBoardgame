@@ -9,8 +9,8 @@
 //           a) flytta egen knekt 1 steg, eller
 //           b) dra ett händelsekort
 //   6   : spelaren går 4 steg, VÄLJER SEDAN:
-//           a) flytta egen knekt 1 steg + dra ett händelsekort, eller
-//           b) flytta egen knekt 2 steg
+//           a) flytta egen knekt 2 steg, eller
+//           b) dra ett händelsekort
 //
 // Max antal steg en spelare någonsin flyttar sin egen pjäs är 4.
 //
@@ -29,10 +29,9 @@
 import { setPendingCopMove, getState } from './state.js';
 
 export const COP_CHOICE = {
-    ROLL_5_MOVE_COP: 'moveCop1',
-    ROLL_5_DRAW_EVENT: 'drawEvent',
-    ROLL_6_MOVE_COP_AND_EVENT: 'moveCop1AndEvent',
-    ROLL_6_MOVE_COP_TWO: 'moveCop2'
+    MOVE_COP_ONE: 'moveCop1',   // endast vid tärning 5
+    MOVE_COP_TWO: 'moveCop2',   // endast vid tärning 6
+    DRAW_EVENT: 'drawEvent'     // vid både 5:a och 6:a
 };
 
 const MAX_STEPS = 4;
@@ -57,9 +56,12 @@ export function resolveDiceRoll(rollValue) {
     }
 
     // 5 och 6: alltid 4 steg + ett val som väntar på spelaren.
+    // Vid 5: flytta knekt 1 steg ELLER dra händelsekort.
+    // Vid 6: flytta knekt 2 steg ELLER dra händelsekort (förenklat
+    // enligt playtest-beslut — ingen kombinerad "knekt+kort"-variant).
     const options = rollValue === 5
-        ? [COP_CHOICE.ROLL_5_MOVE_COP, COP_CHOICE.ROLL_5_DRAW_EVENT]
-        : [COP_CHOICE.ROLL_6_MOVE_COP_AND_EVENT, COP_CHOICE.ROLL_6_MOVE_COP_TWO];
+        ? [COP_CHOICE.MOVE_COP_ONE, COP_CHOICE.DRAW_EVENT]
+        : [COP_CHOICE.MOVE_COP_TWO, COP_CHOICE.DRAW_EVENT];
 
     setPendingCopMove({ roll: rollValue, options, resolved: false });
 
@@ -83,18 +85,14 @@ export function resolveCopChoice(choiceId) {
     let drawsEvent = false;
 
     switch (choiceId) {
-        case COP_CHOICE.ROLL_5_MOVE_COP:
+        case COP_CHOICE.MOVE_COP_ONE:
             copSteps = 1;
             break;
-        case COP_CHOICE.ROLL_5_DRAW_EVENT:
-            drawsEvent = true;
-            break;
-        case COP_CHOICE.ROLL_6_MOVE_COP_AND_EVENT:
-            copSteps = 1;
-            drawsEvent = true;
-            break;
-        case COP_CHOICE.ROLL_6_MOVE_COP_TWO:
+        case COP_CHOICE.MOVE_COP_TWO:
             copSteps = 2;
+            break;
+        case COP_CHOICE.DRAW_EVENT:
+            drawsEvent = true;
             break;
     }
 
