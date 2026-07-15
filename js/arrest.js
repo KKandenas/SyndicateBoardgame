@@ -23,7 +23,7 @@
 // vid bordet.
 // ============================================================
 
-import { getPlayer, mutatePlayer, START_POCKET } from './state.js';
+import { getPlayer, mutatePlayer, START_POCKET, DIRECTION } from './state.js';
 import { assertCanAct } from './turnOrder.js';
 
 export const ArrestResult = {
@@ -37,9 +37,10 @@ export const ArrestResult = {
 //
 // ÄNDRAT (playtest-beslut): HELA offrets fickinnehåll — inte bara
 // beloppet över $20 — går till den gripande spelarens ficka, oavsett
-// hur mycket offret hade (även under $20). Offret skickas sedan
-// tillbaka till sitt Ess (fysiskt, hanteras av spelarna) och fickan
-// laddas alltid om till $20.
+// hur mycket offret hade (även under $20). Offret förlorar även en
+// ev. last de bar (den är bara borta, går inte tillbaka till någon),
+// riktningen återställs till "på väg till Kung", och fickan laddas
+// alltid om till $20.
 export function executeArrest(actingPlayerId, victimId, copOwnerId) {
     assertCanAct(actingPlayerId);
 
@@ -50,7 +51,11 @@ export function executeArrest(actingPlayerId, victimId, copOwnerId) {
     if (loot > 0) {
         mutatePlayer(copOwnerId, { pocket: copOwner.pocket + loot });
     }
-    mutatePlayer(victimId, { pocket: START_POCKET });
+    mutatePlayer(victimId, {
+        pocket: START_POCKET,
+        direction: DIRECTION.TO_KING,
+        hasCargo: false
+    });
 
     return {
         result: loot > 0 ? ArrestResult.LOOTED : ArrestResult.NO_LOOT,
