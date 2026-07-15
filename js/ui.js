@@ -23,7 +23,7 @@
 
 import {
     getState, getPlayer, subscribe, resetGame as resetGameState,
-    mutatePlayer, mutateCityBank, DIRECTION, WINNING_VAULT, CARGO_VALUE
+    mutatePlayer, mutateCityBank, DIRECTION, WINNING_VAULT, CARGO_VALUE, setEconomicCrisis
 } from './state.js';
 import { t, interpolate, gangName, changeLanguage, i18n } from './i18n.js';
 import { startNewGame, isCarryingCargo, getAllPlayerIds, getOtherActivePlayers, PLAYER_COLORS } from './players.js';
@@ -333,6 +333,9 @@ function openEventPopup() {
     const { index, card } = drawRandomEvent();
     currentActiveEventIndex = index;
     pendingPickpocket = (card.id === 'pickpocket');
+    if (card.id === 'economicCrisis') {
+        setEconomicCrisis(getCurrentTurnPlayerId());
+    }
     qs('event-dice-badge').innerText = interpolate(t('eventBadge'), { roll: getState().lastDiceRoll ?? '' });
     qs('event-title').innerText = card.title;
     qs('event-desc').innerText = card.desc;
@@ -428,10 +431,22 @@ function renderPayTargetButtons(recipients) {
 // Snabbvalsknappar $2-$10 — täcker alla möjliga korttullar (2-10 i
 // en vanlig kortlek). Klick fyller bara i beloppsfältet — man måste
 // fortfarande trycka "Bekräfta" för att faktiskt genomföra betalningen.
+// Under Ekonomisk Kris (tills det blir dragarens tur igen) visas
+// dubbla belopp ($4-$20) istället.
 function renderPayAmountQuickButtons() {
+    const crisisActive = getState().economicCrisisDrawerId !== null;
+    const multiplier = crisisActive ? 2 : 1;
+
+    const notice = qs('pay-crisis-notice');
+    if (notice) {
+        notice.style.display = crisisActive ? 'block' : 'none';
+        notice.innerText = t('economicCrisisActive');
+    }
+
     const container = qs('pay-amount-quick');
     container.innerHTML = '';
-    for (let amount = 2; amount <= 10; amount++) {
+    for (let baseAmount = 2; baseAmount <= 10; baseAmount++) {
+        const amount = baseAmount * multiplier;
         const btn = document.createElement('button');
         btn.className = 'btn-success';
         btn.style.flex = '1 1 17%';
