@@ -535,6 +535,12 @@ function finishStreetFight(defenderId, statusLabel) {
             : interpolate(t('fightLogWinner'), { winner: gangName(res.winnerId) });
     }
 
+    // NYTT: destinationen är inget val — den styrs av förlorarens
+    // egen riktning (på väg till Ess -> tillbaka till Kung, och tvärtom).
+    const loser = getPlayer(res.loserId);
+    const destinationKey = loser.direction === DIRECTION.TO_ACE ? 'fightLoserToKing' : 'fightLoserToAce';
+    statusLabel.innerText += ' ' + interpolate(t(destinationKey), { loser: gangName(res.loserId) });
+
     isFighting = false;
     const closeBtn = qs('fight-close-btn');
     closeBtn.style.display = 'block';
@@ -628,8 +634,8 @@ function buildRulesHtml(lang) {
         <h2>Tärningsregel</h2>
         <ul>
             <li><strong>1-4:</strong> Gå så många steg tärningen visar.</li>
-            <li><strong>5:</strong> Gå 4 steg. Välj sedan: flytta din knekt 1 steg, ELLER dra ett händelsekort.</li>
-            <li><strong>6:</strong> Gå 4 steg. Välj sedan: flytta din knekt 2 steg, ELLER dra ett händelsekort.</li>
+            <li><strong>5:</strong> Välj FÖRST: flytta din knekt 1 steg, ELLER dra ett händelsekort. Gå SEDAN 4 steg med din egen droska.</li>
+            <li><strong>6:</strong> Välj FÖRST: flytta din knekt 2 steg, ELLER dra ett händelsekort. Gå SEDAN 4 steg med din egen droska.</li>
             <li>Du får gå framåt, bakåt eller i sidled — aldrig diagonalt (om inte ett händelsekort säger annat).</li>
         </ul>
         <p style="color:#ecc94b;">💡 Glöm inte att betala tull om du landar på en motståndares kvarter — appen påminner dig efter varje drag, men det är upp till er vid bordet att faktiskt göra det.</p>
@@ -644,8 +650,9 @@ function buildRulesHtml(lang) {
 
         <h2>Regler för brädet</h2>
         <ul>
-            <li>Du får inte ställa dig på en motståndares knekt, bara passera över den.</li>
+            <li>Du får inte passera över en motståndares knekt — hitta en annan väg.</li>
             <li>Du får passera men aldrig stanna på en motståndares Kung eller Ess.</li>
+            <li><strong>Tullens storlek styrs av kortets eget värde:</strong> landar du t.ex. på Spader 5 betalar du $5 till Nightspades, landar du på Ruter 9 betalar du $9 till Diamond, och så vidare.</li>
             <li>2-3 spelare: tull för en färg som ingen äger går till stadens kassa istället (via "Överför pengar" → Stadens kassa).</li>
         </ul>
 
@@ -656,11 +663,11 @@ function buildRulesHtml(lang) {
             <li><strong>Vinst:</strong> vinnaren stjäl $10 direkt ur förlorarens ficka.</li>
             <li><strong>Oavgjort:</strong> den som blev attackerad (försvararen) vinner.</li>
             <li>Har förloraren mindre än $10 kvar i fickan tar vinnaren allt som finns, och förlorarens ficka laddas om till $20.</li>
-            <li>Förloraren flyttar sin fysiska droska tillbaka till antingen sitt Ess eller sin Kung — spelarens eget val.</li>
+            <li>Förloraren flyttar sin fysiska droska tillbaka — inget eget val, det styrs av vart de var på väg: på väg mot Ess → tillbaka till Kung. På väg mot Kung → tillbaka till Ess. Appen visar exakt vart du ska.</li>
         </ul>
 
         <h2>Barerna (Damerna) 🥂</h2>
-        <p>Barerna är neutral, fredad mark. Du kan varken bli attackerad i ett slagsmål eller haffad av polisen där, och det är alltid gratis att landa på en Dam oavsett färg. Men det goda livet har sitt pris: du tappar fokus och måste <strong>stå över din nästa runda</strong>.</p>
+        <p>Barerna är neutral, fredad mark. Du kan varken bli attackerad i ett slagsmål eller haffad av polisen där, och det är alltid gratis att landa på en Dam oavsett färg. Men bara en spelare åt gången får plats vid baren — eftersom man inte kan slåss där kan du helt enkelt inte gå in på en Dam som redan är upptagen. Och det goda livet har sitt pris: du tappar fokus och måste <strong>stå över din nästa runda</strong>.</p>
 
         <h2>Polisen (Knektar) & Arresteringar 🚨</h2>
         <p>Poliserna rör sig ENDAST när du väljer det vid tärningsslag 5 eller 6, eller via händelsekortet "Mutor inom polisen". Landar din knekt på en motståndares droska blir den spelaren automatiskt haffad — appen frågar dig direkt efter flytten. Det finns ingen manuell "Haffad"-knapp längre, allt sköts av appen.</p>
@@ -695,8 +702,8 @@ function buildRulesHtml(lang) {
         <h2>Dice Rule</h2>
         <ul>
             <li><strong>1-4:</strong> Move that many spaces.</li>
-            <li><strong>5:</strong> Move 4 spaces. Then choose: move your cop 1 step, OR draw an event card.</li>
-            <li><strong>6:</strong> Move 4 spaces. Then choose: move your cop 2 steps, OR draw an event card.</li>
+            <li><strong>5:</strong> Choose FIRST: move your cop 1 step, OR draw an event card. THEN move your own token 4 spaces.</li>
+            <li><strong>6:</strong> Choose FIRST: move your cop 2 steps, OR draw an event card. THEN move your own token 4 spaces.</li>
             <li>You may move forward, backward, or sideways — never diagonally (unless an event card says otherwise).</li>
         </ul>
         <p style="color:#ecc94b;">💡 Don't forget to pay rent if you land on an opponent's quarter — the app reminds you after every move, but it's on you at the table to actually do it.</p>
@@ -711,8 +718,9 @@ function buildRulesHtml(lang) {
 
         <h2>Board Rules</h2>
         <ul>
-            <li>You may not stop on an opponent's cop, only pass over it.</li>
+            <li>You may not pass over an opponent's cop — you'll have to find another way around.</li>
             <li>You may pass but never stop on an opponent's King or Ace.</li>
+            <li><strong>Rent is set by the card's own value:</strong> land on Spades 5, pay $5 to Nightspades. Land on Diamonds 9, pay $9 to Diamond, and so on.</li>
             <li>2-3 players: rent for an unowned color goes to the city treasury instead (via "Transfer Cash" → City Treasury).</li>
         </ul>
 
@@ -723,11 +731,11 @@ function buildRulesHtml(lang) {
             <li><strong>Victory:</strong> the winner steals $10 straight from the loser's pocket.</li>
             <li><strong>Draw:</strong> the one who got attacked (the defender) wins.</li>
             <li>If the loser has less than $10 left, the winner takes everything they have, and the loser's pocket is refilled to $20.</li>
-            <li>The loser moves their physical token back to either their Ace or their King — the player's own choice.</li>
+            <li>The loser moves their physical token back — no choice involved, it's determined by where they were heading: heading to Ace → back to King. Heading to King → back to Ace. The app shows exactly where to go.</li>
         </ul>
 
         <h2>The Bars (Queens) 🥂</h2>
-        <p>Bars are neutral, safe ground. You can't be attacked in a fight or busted by the cops there, and landing on a Queen is always free regardless of color. But the high life comes at a price: you lose focus and must <strong>skip your next round</strong>.</p>
+        <p>Bars are neutral, safe ground. You can't be attacked in a fight or busted by the cops there, and landing on a Queen is always free regardless of color. But only one player fits at the bar at a time — since fights can't happen there, you simply can't enter a Queen that's already occupied. And the high life comes at a price: you lose focus and must <strong>skip your next round</strong>.</p>
 
         <h2>The Cops (Jacks) & Arrests 🚨</h2>
         <p>Cops move ONLY when you choose to at a dice roll of 5 or 6, or via the "Police Bribery" event card. If your cop lands on an opponent's token, that player is automatically busted — the app asks you right after the move. There's no manual "Busted" button anymore, the app handles it all.</p>
