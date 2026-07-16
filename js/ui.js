@@ -369,6 +369,9 @@ function openPickpocketTargetModal() {
             const res = executePickpocket(getCurrentTurnPlayerId(), p.id);
             toast(`+$${res.stolen}`, 'success');
             hideOverlay('police-overlay');
+            if (res.targetWentBankrupt) {
+                showBankruptPopup(p.id);
+            }
             proceedAfterEventStage();
         };
         grid.appendChild(btn);
