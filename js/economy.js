@@ -137,6 +137,11 @@ export function getPaymentRecipients(payerId) {
 // Regel: den aktiva spelaren väljer VILKEN motståndare pengarna tas
 // från (staden kan inte väljas — bara andra spelare). Tar $10, eller
 // hela offrets ficka om den innehåller mindre än $10.
+//
+// NYTT: töms offrets ficka helt (de hade $10 eller mindre) räknas
+// det som bankrutt — precis som vid misslyckad betalning eller
+// slagsmåls-pity: fickan laddas om till $20, och ui.js visar den
+// blockerande bankrutt-popupen (targetWentBankrupt = true).
 const PICKPOCKET_AMOUNT = 10;
 
 export function executePickpocket(activePlayerId, targetId) {
@@ -144,12 +149,20 @@ export function executePickpocket(activePlayerId, targetId) {
 
     const target = getPlayer(targetId);
     const active = getPlayer(activePlayerId);
-    const stolen = Math.min(target.pocket, PICKPOCKET_AMOUNT);
+    const originalPocket = target.pocket;
+    const stolen = Math.min(originalPocket, PICKPOCKET_AMOUNT);
+    let targetWentBankrupt = false;
 
     if (stolen > 0) {
-        mutatePlayer(targetId, { pocket: target.pocket - stolen });
         mutatePlayer(activePlayerId, { pocket: active.pocket + stolen });
+        const remaining = originalPocket - stolen;
+        if (remaining <= 0) {
+            targetWentBankrupt = true;
+            mutatePlayer(targetId, { pocket: START_POCKET });
+        } else {
+            mutatePlayer(targetId, { pocket: remaining });
+        }
     }
 
-    return { stolen, targetId };
+    return { stolen, targetId, targetWentBankrupt };
 }
