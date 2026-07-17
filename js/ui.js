@@ -40,6 +40,7 @@ let isRolling = false;
 let isFighting = false;
 let activePayerId = null;
 let selectedPayTargetId = null; // vald mottagare i betalningsmodalen (spelar-id eller CITY_BANK_RECIPIENT)
+let selectedPayAmount = null;  // vilket snabbvalsbelopp som senast klickades, för guldram-markering
 let activeAttackerId = null;
 let currentActiveEventIndex = null;
 let pendingDiceSteps = null;   // hur många steg huvudpjäsen ska gå, väntar på att annonseras
@@ -50,6 +51,14 @@ let pendingPickpocketBankruptId = null; // sätts om offret gick i konkurs, trig
 
 // ▶ SEKTION: Hjälpfunktioner
 function qs(id) { return document.getElementById(id); }
+
+// NYTT: Spelarnamn färgade i respektive gängs färg, så det är tydligt
+// vem som är vem i mottagar-/mållistor (betalning, slagsmål, ficktjuv,
+// arrestering). Används med innerHTML eftersom gangName() alltid
+// returnerar fast, känd text — inget användarinmatat att oroa sig för.
+function coloredName(id) {
+    return `<span style="color:${PLAYER_COLORS[id]}">${gangName(id)}</span>`;
+}
 
 function showOverlay(id) { qs(id).classList.add('active'); }
 function hideOverlay(id) { qs(id).classList.remove('active'); }
@@ -422,7 +431,7 @@ function openPickpocketTargetModal() {
     getOtherActivePlayers(getCurrentTurnPlayerId()).forEach(p => {
         const btn = document.createElement('button');
         btn.className = 'police-btn';
-        btn.innerText = `🕵️ ${gangName(p.id)}`;
+        btn.innerHTML = `🕵️ ${coloredName(p.id)}`;
         btn.onclick = () => {
             const res = executePickpocket(getCurrentTurnPlayerId(), p.id);
             hideOverlay('police-overlay');
@@ -477,6 +486,7 @@ export function openPayModal(id) {
 
     const recipients = getPaymentRecipients(id);
     selectedPayTargetId = null; // ingen mottagare förvald — måste väljas aktivt
+    selectedPayAmount = null;
 
     renderPayTargetButtons(recipients);
     renderPayAmountQuickButtons();
@@ -493,7 +503,7 @@ function renderPayTargetButtons(recipients) {
         const btn = document.createElement('button');
         btn.className = 'police-btn pay-target-btn';
         if (r.id === selectedPayTargetId) btn.classList.add('selected');
-        btn.innerText = r.isCityBank ? t('statCityBank') : gangName(r.id);
+        btn.innerHTML = r.isCityBank ? t('statCityBank') : coloredName(r.id);
         btn.onclick = () => {
             selectedPayTargetId = r.id;
             renderPayTargetButtons(recipients);
@@ -522,10 +532,15 @@ function renderPayAmountQuickButtons() {
     for (let baseAmount = 2; baseAmount <= 10; baseAmount++) {
         const amount = baseAmount * multiplier;
         const btn = document.createElement('button');
-        btn.className = 'btn-success';
+        btn.className = 'btn-success pay-amount-btn';
+        if (amount === selectedPayAmount) btn.classList.add('selected');
         btn.style.flex = '1 1 17%';
         btn.innerText = `$${amount}`;
-        btn.onclick = () => { qs('pay-amount').value = amount; };
+        btn.onclick = () => {
+            qs('pay-amount').value = amount;
+            selectedPayAmount = amount;
+            renderPayAmountQuickButtons();
+        };
         container.appendChild(btn);
     }
 }
@@ -586,7 +601,7 @@ function openArrestTargetModal(activePlayerId) {
     getOtherActivePlayers(activePlayerId).forEach(p => {
         const btn = document.createElement('button');
         btn.className = 'police-btn';
-        btn.innerText = `🚨 ${gangName(p.id)}`;
+        btn.innerHTML = `🚨 ${coloredName(p.id)}`;
         btn.onclick = () => {
             const res = executeArrestFromCopMove(activePlayerId, p.id);
             hideOverlay('police-overlay');
@@ -630,7 +645,7 @@ export function openFightModal(id) {
     getOtherActivePlayers(id).forEach(p => {
         const btn = document.createElement('button');
         btn.className = 'police-btn';
-        btn.innerText = t('fightChallenge') + gangName(p.id);
+        btn.innerHTML = t('fightChallenge') + coloredName(p.id);
         btn.onclick = () => startStreetFight(p.id);
         grid.appendChild(btn);
     });

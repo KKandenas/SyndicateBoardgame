@@ -473,6 +473,7 @@ button:disabled { opacity: 0.3; pointer-events: none; }
 .police-btn { text-align: left; padding: 12px; font-size: 13px; }
 .pay-target-btn.selected { border-color: #ecc94b; background: rgba(236, 201, 75, 0.15); color: #ecc94b; }
 #pay-amount-quick button { min-width: 44px; padding: 10px 4px; font-size: 13px; }
+.pay-amount-btn.selected { border-color: #ecc94b; box-shadow: 0 0 0 1px #ecc94b; }
 
 .fight-dice-container { display: flex; justify-content: space-around; margin: 20px 0; gap: 15px; }
 .fight-dice-box { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; flex: 1; text-align: center; }
@@ -493,13 +494,14 @@ button:disabled { opacity: 0.3; pointer-events: none; }
     pointer-events: none;
     width: 90%; max-width: 380px;
 }
-/* NYTT: På iPad ankras toasterna nära toppen av tärningsrutan (uppe
-   höger) istället för att flyta mitt på skärmen över gränsen mellan
-   scoreboard och tärning. Samma horisontella center-formel som
-   popup-hörnet (se #popup-cell nedan), men förankrad uppåt istället
-   för neråt. */
+/* NYTT: På iPad ankras toasterna i samma ruta som popup-fönstren
+   (nedre högra kvadranten, se #popup-cell) istället för att flyta
+   mitt på skärmen eller ligga vid tärningen — allt "meddelande"-
+   liknande hamnar nu i samma hörn. Samma horisontella center-formel
+   som popup-hörnet, förankrad vid kvadrantens överkant så toasterna
+   växer nedåt utan att krocka med en ev. öppen popup i mitten. */
 body:not(.mode-iphone) #toast-container {
-    top: 78px;
+    top: calc(50vh + 35px);
     bottom: auto;
     left: calc(75vw - 4px);
     transform: translateX(-50%);
