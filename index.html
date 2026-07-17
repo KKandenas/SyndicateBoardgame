@@ -15,14 +15,27 @@
     <!-- Toasts (ersätter alert()) -->
     <div id="toast-container"></div>
 
-    <!-- Språkväljare, alltid synlig -->
+    <!-- Språkväljare (iPhone: flytande högst upp, som förut) -->
     <div class="live-lang-selector">
         <button class="btn-lang active" id="live-lang-sv" onclick="window.NoirUI.setLanguage('sv')">SV</button>
         <button class="btn-lang" id="live-lang-en" onclick="window.NoirUI.setLanguage('en')">EN</button>
     </div>
 
-    <!-- NYTT v2: Turordnings-HUD -->
-    <div id="turn-banner"></div>
+    <!-- NYTT: Toppfält, endast iPad-läget. Döljs helt på iPhone (som
+         behåller sina befintliga flytande kontroller orört). -->
+    <div id="top-bar">
+        <div id="top-bar-left">
+            <span id="top-bar-brand">THE NOIR SYNDICATE</span>
+            <button onclick="window.NoirUI.openRulesModal()" data-key="btnRules">📜 Regler</button>
+            <button onclick="window.NoirUI.openAdjustModal()" data-key="btnAdjust">🛠️ Justera</button>
+            <button onclick="window.NoirUI.resetGame()" data-key="btnReset">Återställ</button>
+        </div>
+        <div id="turn-banner"></div>
+        <div id="top-bar-right">
+            <button class="btn-lang active" id="top-lang-sv" onclick="window.NoirUI.setLanguage('sv')">SV</button>
+            <button class="btn-lang" id="top-lang-en" onclick="window.NoirUI.setLanguage('en')">EN</button>
+        </div>
+    </div>
 
     <!-- Startskärm -->
     <div class="welcome-screen" id="welcome-screen">
@@ -56,125 +69,153 @@
 
     <div class="game-container">
 
-        <!-- Spelare 1: Spader -->
-        <div class="player-corner active-tab" id="p1">
-            <div class="gang-header">
-                <div class="gang-title" id="p1-gang-title">♠ Nightspades</div>
-                <div class="deck-suit suit-black" data-key="suitSpades">Spader</div>
-            </div>
-            <div class="direction-badge" id="p1-direction-badge"></div>
-            <div class="stats-grid">
-                <div class="stat-box pocket-box">
-                    <div class="stat-label" data-key="statPocket">💼 Fickan</div>
-                    <div class="stat-value" id="p1-pocket">$20</div>
+        <!-- NYTT: Vänsterkolumn — alla spelare som en lista, ordnade
+             efter bordets layout (Nightspades → Diamond → Crimson →
+             Iron Clovers). Alla rader är lika stora; bara knapparna
+             (Hämta last/Slagsmål/Överför pengar) visas eller döljs
+             beroende på om spelaren är på tur (is-active-turn-klassen,
+             satt av ui.js). På iPhone gör #player-column ingenting
+             (display:contents) — där gäller flik-systemet som förut. -->
+        <div id="player-column">
+
+            <!-- Spelare 1: Spader -->
+            <div class="player-corner active-tab" id="p1">
+                <div class="gang-header">
+                    <div class="gang-title" id="p1-gang-title">♠ Nightspades</div>
+                    <div class="deck-suit suit-black" data-key="suitSpades">Spader</div>
                 </div>
-                <div class="stat-box">
-                    <div class="stat-label" data-key="statVault">🔒 Kista</div>
-                    <div class="stat-value" id="p1-vault" style="color:var(--spades-color)">$0</div>
+                <div class="direction-badge" id="p1-direction-badge"></div>
+                <div class="stats-grid">
+                    <div class="stat-box pocket-box">
+                        <div class="stat-label" data-key="statPocket">💼 Fickan</div>
+                        <div class="stat-value" id="p1-pocket">$20</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label" data-key="statVault">🔒 Kista</div>
+                        <div class="stat-value" id="p1-vault" style="color:var(--spades-color)">$0</div>
+                        <div class="vault-progress"><div class="vault-progress-fill" id="p1-vault-progress" style="background:var(--spades-color)"></div></div>
+                    </div>
+                </div>
+                <div class="gang-actions">
+                    <button id="p1-btn-get-cargo" class="btn-success btn-cargo-action" onclick="window.NoirUI.handleGetCargo(1)">💰 <span data-key="actGetCargo">Hämta last</span></button>
+                    <button id="p1-btn-drop-cargo" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleDropCargo(1)">👑 <span data-key="actDropCargo">Lämna last</span></button>
+                    <button onclick="window.NoirUI.openFightModal(1)" class="btn-fight">💥 <span data-key="actFight">Slagsmål</span></button>
+                    <button onclick="window.NoirUI.openPayModal(1)" class="btn-pay">💸 <span data-key="actPay">Överför pengar ➔</span></button>
                 </div>
             </div>
-            <div class="gang-actions">
-                <button id="p1-btn-get-cargo" class="btn-success btn-cargo-action" onclick="window.NoirUI.handleGetCargo(1)">💰 <span data-key="actGetCargo">Hämta last</span></button>
-                <button id="p1-btn-drop-cargo" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleDropCargo(1)">👑 <span data-key="actDropCargo">Lämna last</span></button>
-                <button onclick="window.NoirUI.openFightModal(1)" class="btn-fight">💥 <span data-key="actFight">Slagsmål</span></button>
-                <button onclick="window.NoirUI.openPayModal(1)" class="btn-pay">💸 <span data-key="actPay">Överför pengar ➔</span></button>
+
+            <!-- Spelare 4: Ruter -->
+            <div class="player-corner" id="p4">
+                <div class="gang-header">
+                    <div class="gang-title" id="p4-gang-title">♦ Diamond</div>
+                    <div class="deck-suit suit-red" data-key="suitDiamonds">Ruter</div>
+                </div>
+                <div class="direction-badge" id="p4-direction-badge"></div>
+                <div class="stats-grid">
+                    <div class="stat-box pocket-box">
+                        <div class="stat-label" data-key="statPocket">💼 Fickan</div>
+                        <div class="stat-value" id="p4-pocket">$20</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label" data-key="statVault">🔒 Kista</div>
+                        <div class="stat-value" id="p4-vault" style="color:var(--diamonds-color)">$0</div>
+                        <div class="vault-progress"><div class="vault-progress-fill" id="p4-vault-progress" style="background:var(--diamonds-color)"></div></div>
+                    </div>
+                </div>
+                <div class="gang-actions">
+                    <button id="p4-btn-get-cargo" class="btn-success btn-cargo-action" onclick="window.NoirUI.handleGetCargo(4)">💰 <span data-key="actGetCargo">Hämta last</span></button>
+                    <button id="p4-btn-drop-cargo" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleDropCargo(4)">👑 <span data-key="actDropCargo">Lämna last</span></button>
+                    <button onclick="window.NoirUI.openFightModal(4)" class="btn-fight">💥 <span data-key="actFight">Slagsmål</span></button>
+                    <button onclick="window.NoirUI.openPayModal(4)" class="btn-pay">💸 <span data-key="actPay">Överför pengar ➔</span></button>
+                </div>
             </div>
+
+            <!-- Spelare 2: Hjärter -->
+            <div class="player-corner" id="p2">
+                <div class="gang-header">
+                    <div class="gang-title" id="p2-gang-title">♥ Crimson</div>
+                    <div class="deck-suit suit-red" data-key="suitHearts">Hjärter</div>
+                </div>
+                <div class="direction-badge" id="p2-direction-badge"></div>
+                <div class="stats-grid">
+                    <div class="stat-box pocket-box">
+                        <div class="stat-label" data-key="statPocket">💼 Fickan</div>
+                        <div class="stat-value" id="p2-pocket">$20</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label" data-key="statVault">🔒 Kista</div>
+                        <div class="stat-value" id="p2-vault" style="color:var(--hearts-color)">$0</div>
+                        <div class="vault-progress"><div class="vault-progress-fill" id="p2-vault-progress" style="background:var(--hearts-color)"></div></div>
+                    </div>
+                </div>
+                <div class="gang-actions">
+                    <button id="p2-btn-get-cargo" class="btn-success btn-cargo-action" onclick="window.NoirUI.handleGetCargo(2)">💰 <span data-key="actGetCargo">Hämta last</span></button>
+                    <button id="p2-btn-drop-cargo" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleDropCargo(2)">👑 <span data-key="actDropCargo">Lämna last</span></button>
+                    <button onclick="window.NoirUI.openFightModal(2)" class="btn-fight">💥 <span data-key="actFight">Slagsmål</span></button>
+                    <button onclick="window.NoirUI.openPayModal(2)" class="btn-pay">💸 <span data-key="actPay">Överför pengar ➔</span></button>
+                </div>
+            </div>
+
+            <!-- Spelare 3: Klöver -->
+            <div class="player-corner" id="p3">
+                <div class="gang-header">
+                    <div class="gang-title" id="p3-gang-title">♣ Iron Clovers</div>
+                    <div class="deck-suit suit-black" data-key="suitClovers">Klöver</div>
+                </div>
+                <div class="direction-badge" id="p3-direction-badge"></div>
+                <div class="stats-grid">
+                    <div class="stat-box pocket-box">
+                        <div class="stat-label" data-key="statPocket">💼 Fickan</div>
+                        <div class="stat-value" id="p3-pocket">$20</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label" data-key="statVault">🔒 Kista</div>
+                        <div class="stat-value" id="p3-vault" style="color:var(--clovers-color)">$0</div>
+                        <div class="vault-progress"><div class="vault-progress-fill" id="p3-vault-progress" style="background:var(--clovers-color)"></div></div>
+                    </div>
+                </div>
+                <div class="gang-actions">
+                    <button id="p3-btn-get-cargo" class="btn-success btn-cargo-action" onclick="window.NoirUI.handleGetCargo(3)">💰 <span data-key="actGetCargo">Hämta last</span></button>
+                    <button id="p3-btn-drop-cargo" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleDropCargo(3)">👑 <span data-key="actDropCargo">Lämna last</span></button>
+                    <button onclick="window.NoirUI.openFightModal(3)" class="btn-fight">💥 <span data-key="actFight">Slagsmål</span></button>
+                    <button onclick="window.NoirUI.openPayModal(3)" class="btn-pay">💸 <span data-key="actPay">Överför pengar ➔</span></button>
+                </div>
+            </div>
+
         </div>
 
-        <!-- Spelare 4: Ruter -->
-        <div class="player-corner" id="p4">
-            <div class="gang-header">
-                <div class="gang-title" id="p4-gang-title">♦ Diamond</div>
-                <div class="deck-suit suit-red" data-key="suitDiamonds">Ruter</div>
-            </div>
-            <div class="direction-badge" id="p4-direction-badge"></div>
-            <div class="stats-grid">
-                <div class="stat-box pocket-box">
-                    <div class="stat-label" data-key="statPocket">💼 Fickan</div>
-                    <div class="stat-value" id="p4-pocket">$20</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label" data-key="statVault">🔒 Kista</div>
-                    <div class="stat-value" id="p4-vault" style="color:var(--diamonds-color)">$0</div>
-                </div>
-            </div>
-            <div class="gang-actions">
-                <button id="p4-btn-get-cargo" class="btn-success btn-cargo-action" onclick="window.NoirUI.handleGetCargo(4)">💰 <span data-key="actGetCargo">Hämta last</span></button>
-                <button id="p4-btn-drop-cargo" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleDropCargo(4)">👑 <span data-key="actDropCargo">Lämna last</span></button>
-                <button onclick="window.NoirUI.openFightModal(4)" class="btn-fight">💥 <span data-key="actFight">Slagsmål</span></button>
-                <button onclick="window.NoirUI.openPayModal(4)" class="btn-pay">💸 <span data-key="actPay">Överför pengar ➔</span></button>
-            </div>
-        </div>
+        <!-- NYTT: Högerkolumn — tärning/turhantering. Händelsekortens
+             popup (#event-overlay, se modaler längre ner i filen)
+             förankras visuellt till detta hörn via CSS för iPad,
+             istället för att täcka hela skärmen i mitten som på
+             iPhone. Ingen extra markup behövs för det. På iPhone gör
+             #right-column ingenting (display:contents); center-console
+             hamnar överst som förut via order:-1. -->
+        <div id="right-column">
 
-        <div class="side-bar-left">THE NOIR SYNDICATE</div>
-        <div class="side-bar-right">BOARD HUB v2.0</div>
+            <!-- Mittkonsol / Tärning -->
+            <div class="center-console">
+                <div class="dice-wrapper">
+                    <div id="dice-container" onclick="window.NoirUI.rollDice()">
+                        <div class="dot" id="d1"></div><div class="dot" id="d2"></div><div class="dot" id="d3"></div>
+                        <div class="dot" id="d4"></div><div class="dot" id="d5"></div><div class="dot" id="d6"></div>
+                        <div class="dot" id="d7"></div><div class="dot" id="d8"></div><div class="dot" id="d9"></div>
+                    </div>
+                    <div class="dice-label pulse-text" id="dice-label" data-key="diceClick">KLICKA FÖR ATT SLÅ</div>
+                </div>
+                <div style="display:flex; gap:8px; width: 100%; max-width: 240px; justify-content: center; flex-wrap: wrap;">
+                    <button id="btn-next-player" onclick="window.NoirUI.nextPlayer()" data-key="btnNextPlayer" style="grid-column: 1 / -1; width:100%;">✅ Nästa spelare</button>
+                    <!-- Dessa tre finns nu även i #top-bar för iPad — döljs där
+                         via CSS (.legacy-utility-row) så de inte syns dubbelt.
+                         På iPhone är detta fortfarande enda platsen de visas. -->
+                    <div class="legacy-utility-row" style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+                        <button onclick="window.NoirUI.openRulesModal()" style="font-size:11px; padding:6px 12px; background:rgba(0,0,0,0.6);" data-key="btnRules">📜 Regler</button>
+                        <button onclick="window.NoirUI.openAdjustModal()" style="font-size:11px; padding:6px 12px; background:rgba(0,0,0,0.6); color:#666;" data-key="btnAdjust">🛠️ Justera</button>
+                        <button onclick="window.NoirUI.resetGame()" style="font-size:11px; padding:6px 12px; background:rgba(0,0,0,0.6); color:#666;" data-key="btnReset">Återställ</button>
+                    </div>
+                </div>
+            </div>
 
-        <!-- Mittkonsol / Tärning -->
-        <div class="center-console">
-            <div class="dice-wrapper">
-                <div id="dice-container" onclick="window.NoirUI.rollDice()">
-                    <div class="dot" id="d1"></div><div class="dot" id="d2"></div><div class="dot" id="d3"></div>
-                    <div class="dot" id="d4"></div><div class="dot" id="d5"></div><div class="dot" id="d6"></div>
-                    <div class="dot" id="d7"></div><div class="dot" id="d8"></div><div class="dot" id="d9"></div>
-                </div>
-                <div class="dice-label pulse-text" id="dice-label" data-key="diceClick">KLICKA FÖR ATT SLÅ</div>
-            </div>
-            <div style="display:flex; gap:8px; width: 100%; max-width: 240px; justify-content: center; flex-wrap: wrap;">
-                <button id="btn-next-player" onclick="window.NoirUI.nextPlayer()" data-key="btnNextPlayer" style="grid-column: 1 / -1; width:100%;">✅ Nästa spelare</button>
-                <button onclick="window.NoirUI.openRulesModal()" style="font-size:11px; padding:6px 12px; background:rgba(0,0,0,0.6);" data-key="btnRules">📜 Regler</button>
-                <button onclick="window.NoirUI.openAdjustModal()" style="font-size:11px; padding:6px 12px; background:rgba(0,0,0,0.6); color:#666;" data-key="btnAdjust">🛠️ Justera</button>
-                <button onclick="window.NoirUI.resetGame()" style="font-size:11px; padding:6px 12px; background:rgba(0,0,0,0.6); color:#666;" data-key="btnReset">Återställ</button>
-            </div>
-        </div>
-
-        <!-- Spelare 3: Klöver -->
-        <div class="player-corner" id="p3">
-            <div class="gang-header">
-                <div class="gang-title" id="p3-gang-title">♣ Iron Clovers</div>
-                <div class="deck-suit suit-black" data-key="suitClovers">Klöver</div>
-            </div>
-            <div class="direction-badge" id="p3-direction-badge"></div>
-            <div class="stats-grid">
-                <div class="stat-box pocket-box">
-                    <div class="stat-label" data-key="statPocket">💼 Fickan</div>
-                    <div class="stat-value" id="p3-pocket">$20</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label" data-key="statVault">🔒 Kista</div>
-                    <div class="stat-value" id="p3-vault" style="color:var(--clovers-color)">$0</div>
-                </div>
-            </div>
-            <div class="gang-actions">
-                <button id="p3-btn-get-cargo" class="btn-success btn-cargo-action" onclick="window.NoirUI.handleGetCargo(3)">💰 <span data-key="actGetCargo">Hämta last</span></button>
-                <button id="p3-btn-drop-cargo" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleDropCargo(3)">👑 <span data-key="actDropCargo">Lämna last</span></button>
-                <button onclick="window.NoirUI.openFightModal(3)" class="btn-fight">💥 <span data-key="actFight">Slagsmål</span></button>
-                <button onclick="window.NoirUI.openPayModal(3)" class="btn-pay">💸 <span data-key="actPay">Överför pengar ➔</span></button>
-            </div>
-        </div>
-
-        <!-- Spelare 2: Hjärter -->
-        <div class="player-corner" id="p2">
-            <div class="gang-header">
-                <div class="gang-title" id="p2-gang-title">♥ Crimson</div>
-                <div class="deck-suit suit-red" data-key="suitHearts">Hjärter</div>
-            </div>
-            <div class="direction-badge" id="p2-direction-badge"></div>
-            <div class="stats-grid">
-                <div class="stat-box pocket-box">
-                    <div class="stat-label" data-key="statPocket">💼 Fickan</div>
-                    <div class="stat-value" id="p2-pocket">$20</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label" data-key="statVault">🔒 Kista</div>
-                    <div class="stat-value" id="p2-vault" style="color:var(--hearts-color)">$0</div>
-                </div>
-            </div>
-            <div class="gang-actions">
-                <button id="p2-btn-get-cargo" class="btn-success btn-cargo-action" onclick="window.NoirUI.handleGetCargo(2)">💰 <span data-key="actGetCargo">Hämta last</span></button>
-                <button id="p2-btn-drop-cargo" class="btn-secure btn-cargo-action" onclick="window.NoirUI.handleDropCargo(2)">👑 <span data-key="actDropCargo">Lämna last</span></button>
-                <button onclick="window.NoirUI.openFightModal(2)" class="btn-fight">💥 <span data-key="actFight">Slagsmål</span></button>
-                <button onclick="window.NoirUI.openPayModal(2)" class="btn-pay">💸 <span data-key="actPay">Överför pengar ➔</span></button>
-            </div>
         </div>
     </div>
 
