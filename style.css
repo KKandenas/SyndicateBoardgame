@@ -230,9 +230,14 @@ body:not(.mode-iphone) #right-column {
     grid-area: dice;
     display: flex;
     flex-direction: column;
+    align-items: center;
     justify-content: center;
     min-height: 0;
     min-width: 0;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.6);
 }
 /* #popup-cell lägger inte till någon egen box i rutnätet — dess barn
    (.overlay-modalerna) är position:fixed och förankras visuellt till
@@ -376,6 +381,7 @@ body:not(.mode-iphone) .player-corner {
     text-transform: uppercase;
     letter-spacing: 1px;
     color: var(--text-muted);
+    order: -1;
 }
 .scoreboard-gang {
     font-weight: 800;
@@ -486,6 +492,19 @@ button:disabled { opacity: 0.3; pointer-events: none; }
     align-items: center;
     pointer-events: none;
     width: 90%; max-width: 380px;
+}
+/* NYTT: På iPad ankras toasterna nära toppen av tärningsrutan (uppe
+   höger) istället för att flyta mitt på skärmen över gränsen mellan
+   scoreboard och tärning. Samma horisontella center-formel som
+   popup-hörnet (se #popup-cell nedan), men förankrad uppåt istället
+   för neråt. */
+body:not(.mode-iphone) #toast-container {
+    top: 78px;
+    bottom: auto;
+    left: calc(75vw - 4px);
+    transform: translateX(-50%);
+    width: auto;
+    max-width: 320px;
 }
 .toast {
     background: rgba(15,15,15,0.97);

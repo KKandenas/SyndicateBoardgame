@@ -46,6 +46,7 @@ let pendingDiceSteps = null;   // hur många steg huvudpjäsen ska gå, väntar 
 let copFlowContext = null;     // håller reda på var i 5:an/6:an-kedjan vi befinner oss
 let pendingPickpocket = false; // true = det aktuella händelsekortet är Ficktjuv, kräver målval
 let lastFightBankruptLoserId = null; // sätts av finishStreetFight, triggar bankrutt-popup vid stängning
+let pendingPickpocketBankruptId = null; // sätts om offret gick i konkurs, triggar bankrutt-popup vid stängning
 
 // ▶ SEKTION: Hjälpfunktioner
 function qs(id) { return document.getElementById(id); }
@@ -85,6 +86,7 @@ function renderAll() {
     const state = getState();
     applyStaticTranslations();
     getAllPlayerIds().forEach(renderPlayerPanel);
+    renderScoreboardOrder();
     renderTurnBanner(state);
     renderCityBank(state);
     renderWinOverlay(state);
@@ -167,6 +169,29 @@ function renderScoreboardRow(id, player) {
     }
 
     row.classList.toggle('is-active-turn', isActionAllowed(id));
+}
+
+// NYTT: Ledarställningen sorteras — 1) mest säkrat i kistan, 2) på väg
+// tillbaka (bär last mot Esset) räknas före på väg ut mot Kungen,
+// 3) mest i fickan. Ordningen sätts via CSS `order` (rutnätet är redan
+// display:flex; flex-direction:column i #scoreboard), så ingen DOM-
+// omflyttning krävs — rubrikraden har alltid order:-1 (se style.css).
+function renderScoreboardOrder() {
+    const ranked = getAllPlayerIds()
+        .map(id => ({ id, player: getPlayer(id) }))
+        .filter(({ player }) => player.active)
+        .sort((a, b) => {
+            if (b.player.vault !== a.player.vault) return b.player.vault - a.player.vault;
+            const aHeadingBack = a.player.direction === DIRECTION.TO_ACE;
+            const bHeadingBack = b.player.direction === DIRECTION.TO_ACE;
+            if (aHeadingBack !== bHeadingBack) return aHeadingBack ? -1 : 1;
+            return b.player.pocket - a.player.pocket;
+        });
+
+    ranked.forEach(({ id }, index) => {
+        const row = qs(`sb-p${id}`);
+        if (row) row.style.order = index + 1;
+    });
 }
 
 function renderTurnBanner(state) {
@@ -400,16 +425,35 @@ function openPickpocketTargetModal() {
         btn.innerText = `🕵️ ${gangName(p.id)}`;
         btn.onclick = () => {
             const res = executePickpocket(getCurrentTurnPlayerId(), p.id);
-            toast(`+$${res.stolen}`, 'success');
             hideOverlay('police-overlay');
-            if (res.targetWentBankrupt) {
-                showBankruptPopup(p.id);
-            }
-            proceedAfterEventStage();
+            showPickpocketResultPopup(res, p.id);
         };
         grid.appendChild(btn);
     });
     showOverlay('police-overlay');
+}
+
+// NYTT: Visas som en blockerande popup (istället för en toast) så att
+// beloppet som stals inte missas. Fortsätter 5:an/6:an-kedjan
+// (announceMainSteps) när spelaren bekräftar med "Uppfattat" — precis
+// som tidigare visas en ev. bankrutt-popup för offret innan kedjan
+// går vidare.
+function showPickpocketResultPopup(res, targetId) {
+    qs('pickpocket-result-message').innerText = interpolate(t('pickpocketResultMessage'), {
+        amount: res.stolen, target: gangName(targetId)
+    });
+    pendingPickpocketBankruptId = res.targetWentBankrupt ? targetId : null;
+    showOverlay('pickpocket-result-overlay');
+}
+
+export function closePickpocketResultPopup() {
+    hideOverlay('pickpocket-result-overlay');
+    if (pendingPickpocketBankruptId !== null) {
+        const bankruptId = pendingPickpocketBankruptId;
+        pendingPickpocketBankruptId = null;
+        showBankruptPopup(bankruptId);
+    }
+    proceedAfterEventStage();
 }
 
 // ▶ SEKTION: Ekonomi

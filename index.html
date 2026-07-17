@@ -310,6 +310,15 @@
                 </div>
             </div>
 
+            <!-- NYTT: Resultat-popup för Ficktjuv-kortet (ersätter tidigare toast) -->
+            <div class="overlay" id="pickpocket-result-overlay">
+                <div class="popup" style="border-color:#ecc94b;">
+                    <div class="popup-title" style="color:#ecc94b;" data-key="pickpocketResultTitle">🕵️ Ficktjuv!</div>
+                    <div class="popup-desc" id="pickpocket-result-message"></div>
+                    <button class="popup-btn" onclick="window.NoirUI.closePickpocketResultPopup()" data-key="btnOk">Uppfattat</button>
+                </div>
+            </div>
+
             <!-- Betalning -->
             <div class="overlay" id="pay-overlay">
                 <div class="popup" style="border-color:#ecc94b;">
