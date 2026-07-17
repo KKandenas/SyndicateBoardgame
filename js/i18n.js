@@ -107,6 +107,7 @@ export const i18n = {
         // --- Polis / arrestering ---
         policeTitle: "Vem blev gripen?",
         policeSubtitle: "Fickpengarna tillfaller din egen ficka. Den gripne går tillbaka till sin Kung och förlorar en ev. last.",
+        arrestResultTitle: "🚨 Haffad!",
 
         // --- Slagsmål ---
         fightTitle: "Gatuslagsmål!",
@@ -230,6 +231,7 @@ export const i18n = {
 
         policeTitle: "Who got caught?",
         policeSubtitle: "The pocket cash goes to your own pocket. The one caught returns to their King and loses any cargo.",
+        arrestResultTitle: "🚨 Busted!",
 
         fightTitle: "Street Fight!",
         fightPrompt: "Select the opponent occupying the square to attack:",

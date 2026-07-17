@@ -535,51 +535,94 @@ body.mode-iphone .game-container {
 body.mode-iphone .center-console { order: -1; flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 10px; }
 
 /* NYTT: Alla spelrelaterade popup-fönster (#popup-cell, se index.html)
-   förankras i nedre högra hörnet på iPad — den fjärde rutan — istället
-   för att täcka hela skärmen i mitten. Transparent bakgrund runt kortet
-   så resten av spelplanen syns bakom, men overlayn täcker ändå hela
-   viewporten (position:fixed ärvs från .overlay) så klick fortfarande
-   blockeras tills popupen stängs. Regler/Justera/Vinst ligger utanför
-   #popup-cell och förblir centrerade helskärmsmodaler (för mycket
-   innehåll för att få plats i en kvadrant). */
+   centreras i nedre högra rutan på iPad — den fjärde kvadranten —
+   istället för att täcka hela skärmen i mitten. Overlayn själv täcker
+   ändå hela viewporten (position:fixed ärvs från .overlay) så klick
+   fortfarande blockeras tills popupen stängs, men den SYNLIGA kortet
+   (.popup) positioneras fristående med fixed + calc() så det hamnar
+   mitt i kvadranten snarare än mitt på hela skärmen. Talen är
+   härledda ur .game-container:s grid (16px padding/gap, 2x2 lika
+   rutor) och toppfältets uppmätta höjd (~54px) — se PR-beskrivning
+   för räkneexemplet. Regler/Justera/Vinst ligger utanför #popup-cell
+   och förblir centrerade helskärmsmodaler (för mycket innehåll för
+   att få plats i en kvadrant). */
 body:not(.mode-iphone) #popup-cell > .overlay {
     background: transparent;
-    align-items: flex-end;
-    justify-content: flex-end;
-    padding: 20px;
 }
 body:not(.mode-iphone) #popup-cell > .overlay .popup {
-    max-width: 360px;
-    max-height: calc(50vh - 56px);
+    position: fixed;
+    left: calc(75vw - 4px);
+    top: calc(75vh + 10px);
+    transform: translate(-50%, -50%);
+    width: calc(50vw - 56px);
+    max-width: 340px;
+    max-height: calc(50vh - 76px);
     overflow-y: auto;
-    padding: 18px;
+    padding: 14px;
     box-shadow: 0 20px 50px rgba(0,0,0,0.9);
 }
 body:not(.mode-iphone) #popup-cell > .overlay .popup-title {
-    font-size: 18px;
+    font-size: 17px;
+    margin-bottom: 6px;
+}
+body:not(.mode-iphone) #popup-cell > .overlay .popup-desc {
+    margin-bottom: 10px;
 }
 /* Kompaktare inre spacing i popup-hörnet — mottagar-/målvals-listor
    (spelare att slåss mot/betala/haffa) blir två kolumner istället för
-   en, så längre listor inte tvingar fram onödig scroll i den lilla
-   rutan. */
+   en, och marginaler/knappar krymps, så längre listor inte tvingar
+   fram scroll i den lilla rutan. */
 body:not(.mode-iphone) #popup-cell .police-selector-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 6px;
+    gap: 5px;
+    margin-top: 8px !important;
 }
 body:not(.mode-iphone) #popup-cell .police-btn {
-    padding: 8px 6px;
-    font-size: 12px;
+    padding: 7px 5px;
+    font-size: 11px;
 }
 body:not(.mode-iphone) #popup-cell #pay-target-grid,
-body:not(.mode-iphone) #popup-cell #pay-amount-quick {
-    margin-bottom: 8px !important;
+body:not(.mode-iphone) #popup-cell #pay-amount-quick,
+body:not(.mode-iphone) #popup-cell .pay-grid {
+    margin-bottom: 6px !important;
 }
 body:not(.mode-iphone) #popup-cell .popup label {
-    margin-bottom: 3px !important;
+    margin-bottom: 2px !important;
+    font-size: 10px !important;
 }
 body:not(.mode-iphone) #popup-cell #pay-amount-quick button {
-    padding: 6px 4px;
+    padding: 4px 3px;
+    font-size: 10px;
+}
+body:not(.mode-iphone) #popup-cell .popup input {
+    padding: 5px !important;
+}
+body:not(.mode-iphone) #popup-cell .popup > div[style*="display:flex"] > button {
+    padding: 8px !important;
+}
+body:not(.mode-iphone) #popup-cell .fight-dice-container {
+    margin: 8px 0;
+    gap: 8px;
+}
+body:not(.mode-iphone) #popup-cell .fight-dice-box {
+    padding: 8px;
+}
+body:not(.mode-iphone) #popup-cell .fight-dice-name {
+    height: auto;
+    margin-bottom: 4px;
+    font-size: 10px;
+}
+body:not(.mode-iphone) #popup-cell .fight-dice-value {
+    font-size: 26px;
+}
+body:not(.mode-iphone) #popup-cell .order-notice {
+    padding: 6px;
+    margin-bottom: 8px;
     font-size: 11px;
+}
+body:not(.mode-iphone) #popup-cell .popup-btn {
+    padding: 9px;
+    margin-top: 8px;
 }
 body.mode-iphone .dice-wrapper { margin-top: 50px; }
 body.mode-iphone .player-corner.active-tab { display: flex; }
