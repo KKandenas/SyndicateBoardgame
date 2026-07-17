@@ -105,6 +105,7 @@ function renderPlayerPanel(id) {
     if (!panel) return;
 
     panel.style.display = player.active ? '' : 'none';
+    renderScoreboardRow(id, player);
     if (!player.active) return;
 
     qs(`p${id}-gang-title`).innerText = gangName(id);
@@ -141,6 +142,31 @@ function renderPlayerPanel(id) {
     panel.querySelectorAll('button').forEach(btn => {
         btn.disabled = !isMyTurn;
     });
+}
+
+// NYTT: Scoreboardet (nedre vänstra rutan på iPad) — kompakt
+// ledarställning för alla spelare parallellt med huvudkortet i
+// #player-column. Ingen egen render-logik i övrigt (inga knappar),
+// bara riktning/ficka/säkrat samt vems tur det är just nu.
+function renderScoreboardRow(id, player) {
+    const row = qs(`sb-p${id}`);
+    if (!row) return;
+
+    row.style.display = player.active ? '' : 'none';
+    if (!player.active) return;
+
+    qs(`sb-p${id}-gang`).innerText = gangName(id);
+    qs(`sb-p${id}-pocket`).innerText = `$${player.pocket}`;
+    qs(`sb-p${id}-vault`).innerText = `$${player.vault}`;
+
+    const directionEl = qs(`sb-p${id}-direction`);
+    if (directionEl) {
+        directionEl.innerText = player.direction === DIRECTION.TO_KING
+            ? t('directionToKing')
+            : t('directionToAce');
+    }
+
+    row.classList.toggle('is-active-turn', isActionAllowed(id));
 }
 
 function renderTurnBanner(state) {
