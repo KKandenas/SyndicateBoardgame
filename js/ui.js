@@ -111,6 +111,13 @@ function renderPlayerPanel(id) {
     qs(`p${id}-pocket`).innerText = `$${player.pocket}`;
     qs(`p${id}-vault`).innerText = `$${player.vault}`;
 
+    // NYTT: progressbar mot vinst ($3000 / 3 kistor).
+    const progressFill = qs(`p${id}-vault-progress`);
+    if (progressFill) {
+        const percent = Math.min(100, (player.vault / WINNING_VAULT) * 100);
+        progressFill.style.width = `${percent}%`;
+    }
+
     // Riktningsbadge (NYTT) — visar tydligt vad spelaren är på väg att göra.
     const badge = qs(`p${id}-direction-badge`);
     if (badge) {
