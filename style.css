@@ -36,6 +36,13 @@ body {
     overflow: hidden;
     padding: 0;
 }
+/* iPad: body blir en flex-kolumn så #top-bar + .game-container staplas
+   naturligt ovanpå varandra. iPhone rörs inte (använder fixed/flytande
+   element som förut, oberoende av body:s display-typ). */
+body:not(.mode-iphone) {
+    display: flex;
+    flex-direction: column;
+}
 
 .background-container {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -101,12 +108,34 @@ body {
     background: rgba(0,0,0,0.6); padding: 4px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);
 }
 .live-lang-selector .btn-lang { padding: 4px 8px; font-size: 10px; }
+/* På iPad ersätts denna av #top-bar-right — dölj originalet där. */
+body:not(.mode-iphone) .live-lang-selector { display: none; }
+
+/* ---------------- NYTT: Toppfält (endast iPad) ---------------- */
+#top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 20px;
+    background: rgba(0,0,0,0.55);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    flex: 0 0 auto;
+    z-index: 80;
+}
+body.mode-iphone #top-bar { display: none; }
+#top-bar-left, #top-bar-right { display: flex; align-items: center; gap: 8px; }
+#top-bar-brand {
+    font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(255,255,255,0.35); font-weight: 900; margin-right: 8px;
+    white-space: nowrap;
+}
+#top-bar-left button {
+    font-size: 11px; padding: 7px 12px; background: rgba(0,0,0,0.6);
+}
 
 /* ---------------- NYTT v2: Turordnings-HUD ---------------- */
 #turn-banner {
-    position: fixed;
-    top: 15px; left: 50%; transform: translateX(-50%);
-    z-index: 85;
     background: rgba(0,0,0,0.75);
     border: 2px solid var(--spades-color);
     border-radius: 20px;
@@ -116,6 +145,16 @@ body {
     letter-spacing: 2px;
     text-transform: uppercase;
     box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+    white-space: nowrap;
+}
+/* iPhone: flytande badge längst upp, som förut (oberoende av att elementet
+   nu ligger i #top-bar:s DOM — fixed positionering bryr sig inte om det). */
+body.mode-iphone #turn-banner {
+    position: fixed;
+    top: 60px; left: 50%; transform: translateX(-50%);
+    z-index: 85;
+    font-size: 10px;
+    padding: 5px 14px;
 }
 
 #btn-next-player {
@@ -126,20 +165,6 @@ body {
     font-size: 13px;
     border-radius: 24px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.7);
-    margin-bottom: 4px;
-}
-/* På iPad (inte iPhone-läge): flytande pill-knapp längst ner, som förut.
-   max-width + white-space:nowrap säkerställer att den aldrig svämmar
-   över in i sidopanelernas kolumn, oavsett textlängd/språk. */
-body:not(.mode-iphone) #btn-next-player {
-    position: fixed;
-    bottom: 15px; left: 50%; transform: translateX(-50%);
-    z-index: 85;
-    margin-bottom: 0;
-    padding: 10px 16px;
-    font-size: 12px;
-    max-width: 170px;
-    white-space: nowrap;
 }
 
 .player-corner.is-active-turn {
@@ -151,13 +176,39 @@ body:not(.mode-iphone) #btn-next-player {
     50% { box-shadow: 0 0 0 4px var(--gang-color), 0 12px 40px rgba(0,0,0,0.6); }
     100% { box-shadow: 0 0 0 2px var(--gang-color), 0 12px 40px rgba(0,0,0,0.6); }
 }
+body:not(.mode-iphone) .legacy-utility-row { display: none; }
 
 /* ---------------- Spelplan ---------------- */
 .game-container {
-    display: grid;
-    grid-template-rows: 320px 1fr 320px;
-    grid-template-columns: 380px 1fr 380px;
-    padding: 20px; gap: 20px; height: 100vh; overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    padding: 20px;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* Wrapper-kolumnerna gör ingenting på iPhone (display:contents) —
+   där ligger .player-corner/.center-console kvar som direkta
+   flex-barn till .game-container precis som innan omdesignen. */
+#player-column, #right-column {
+    min-height: 0;
+}
+body:not(.mode-iphone) #player-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1 1 50%;
+}
+body:not(.mode-iphone) #right-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1 1 50%;
+}
+body.mode-iphone #player-column, body.mode-iphone #right-column {
+    display: contents;
 }
 
 body.mode-iphone .player-corner { display: none; }
@@ -179,10 +230,25 @@ body.mode-iphone .player-corner.active-tab { display: flex; }
     background-color: var(--gang-color); border-radius: 12px 12px 0 0;
 }
 
-#p1 { --gang-color: var(--spades-color);   grid-area: 1 / 1; }
-#p4 { --gang-color: var(--diamonds-color); grid-area: 1 / 3; }
-#p3 { --gang-color: var(--clovers-color);  grid-area: 3 / 1; }
-#p2 { --gang-color: var(--hearts-color);   grid-area: 3 / 3; }
+#p1 { --gang-color: var(--spades-color); }
+#p4 { --gang-color: var(--diamonds-color); }
+#p2 { --gang-color: var(--hearts-color); }
+#p3 { --gang-color: var(--clovers-color); }
+
+/* NYTT: Spelarlista på iPad — alla rader ungefär lika stora. Enda
+   skillnaden mellan aktiv och inaktiv spelare är att handlingsknapparna
+   (.gang-actions) döljs för den som inte är på tur. Ingen dramatisk
+   storleksskillnad, matchar "leaderboard"-känslan. */
+body:not(.mode-iphone) .player-corner {
+    flex: 1 1 0;
+    min-height: 0;
+    padding: 12px 16px;
+    justify-content: flex-start;
+    gap: 6px;
+}
+body:not(.mode-iphone) .player-corner:not(.is-active-turn) .gang-actions {
+    display: none;
+}
 
 .gang-header {
     display: flex; justify-content: space-between; align-items: center;
@@ -222,6 +288,22 @@ body.mode-iphone .player-corner.active-tab { display: flex; }
 .stat-value { font-size: 20px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.9); }
 .stat-box.pocket-box .stat-value { color: #fff; font-size: 22px; }
 
+/* NYTT: Progressbar för kistan (framsteg mot vinst). */
+.vault-progress {
+    width: 100%;
+    height: 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    margin-top: 6px;
+    overflow: hidden;
+}
+.vault-progress-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 2px;
+    transition: width 0.4s ease;
+}
+
 .gang-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
 button {
@@ -243,7 +325,6 @@ button:disabled { opacity: 0.3; pointer-events: none; }
 .gang-actions .btn-fight { grid-column: span 2; }
 
 .center-console {
-    grid-area: 1 / 2 / 4 / 3;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
 }
 .dice-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 180px; width: 220px; }
@@ -262,9 +343,6 @@ button:disabled { opacity: 0.3; pointer-events: none; }
 }
 .pulse-text { animation: pulse 2s infinite; }
 @keyframes pulse { 0% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.03); } 100% { opacity: 0.6; transform: scale(1); } }
-
-.side-bar-left, .side-bar-right { display: flex; color: rgba(255,255,255,0.12); font-size: 12px; letter-spacing: 3px; text-transform: uppercase; font-weight: bold; justify-content: center; align-items: center; }
-.side-bar-left { grid-area: 2 / 1; } .side-bar-right { grid-area: 2 / 3; }
 
 /* ---------------- Modaler/overlays (generellt) ---------------- */
 .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.15s ease; }
@@ -354,8 +432,22 @@ body.mode-iphone .game-container {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
 }
-body.mode-iphone .side-bar-left, body.mode-iphone .side-bar-right { display: none; }
 body.mode-iphone .center-console { order: -1; flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 10px; }
+
+/* NYTT: Händelsekorten förankras i nedre högra hörnet på iPad istället
+   för att täcka hela skärmen i mitten. Transparent bakgrund runt kortet
+   så resten av spelplanen syns bakom — men klick blockeras fortfarande
+   tills "Uppfattat" trycks (ärver .overlay/.overlay.active-beteendet). */
+body:not(.mode-iphone) #event-overlay {
+    background: transparent;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding: 24px;
+}
+body:not(.mode-iphone) #event-overlay .popup {
+    max-width: 320px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+}
 body.mode-iphone .dice-wrapper { margin-top: 50px; }
 body.mode-iphone .player-corner.active-tab { display: flex; }
 body.mode-iphone .stats-grid { margin: 10px 0; gap: 8px; }
@@ -363,4 +455,3 @@ body.mode-iphone .stat-value { font-size: 18px; }
 body.mode-iphone .stat-box.pocket-box .stat-value { font-size: 20px; }
 body.mode-iphone button { padding: 10px 6px; font-size: 12px; }
 body.mode-iphone .iphone-tabs { display: grid; }
-body.mode-iphone #turn-banner { top: 60px; font-size: 10px; padding: 5px 14px; }
