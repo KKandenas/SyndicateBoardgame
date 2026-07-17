@@ -27,7 +27,7 @@ export const eventPool = {
         {
             id: 'bribery',
             title: "💵 Mutor inom polisen",
-            desc: "Du har köpt en konstabel. Du får flytta ut valfri motståndares polis (Knekt) till sin ursprungliga startplats i mitten."
+            desc: "Du har köpt en konstapel. Du får flytta ut valfri motståndares polis (Knekt) till sin ursprungliga startplats i mitten."
         },
         {
             id: 'turfWar',
