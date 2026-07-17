@@ -545,23 +545,28 @@ function openArrestTargetModal(activePlayerId) {
         btn.innerText = `🚨 ${gangName(p.id)}`;
         btn.onclick = () => {
             const res = executeArrestFromCopMove(activePlayerId, p.id);
-            reportArrestResult(res, p.id, activePlayerId);
             hideOverlay('police-overlay');
-            announceMainSteps();
+            reportArrestResult(res, p.id, activePlayerId);
         };
         grid.appendChild(btn);
     });
     showOverlay('police-overlay');
 }
 
+// NYTT: Visas som en blockerande popup (istället för en toast) så att
+// resultatet av en gripning inte missas — fortsätter 5:an/6:an-kedjan
+// (announceMainSteps) först när spelaren bekräftar med "Uppfattat".
 function reportArrestResult(res, victimId, copOwnerId) {
-    if (res.result === ArrestResult.LOOTED) {
-        toast(interpolate(t('alertArrested'), {
-            victim: gangName(victimId), cop: gangName(copOwnerId), loot: res.loot
-        }), 'danger');
-    } else {
-        toast(interpolate(t('alertJail'), { victim: gangName(victimId) }), 'default');
-    }
+    const message = res.result === ArrestResult.LOOTED
+        ? interpolate(t('alertArrested'), { victim: gangName(victimId), cop: gangName(copOwnerId), loot: res.loot })
+        : interpolate(t('alertJail'), { victim: gangName(victimId) });
+    qs('arrest-result-message').innerText = message;
+    showOverlay('arrest-result-overlay');
+}
+
+export function closeArrestResultPopup() {
+    hideOverlay('arrest-result-overlay');
+    announceMainSteps();
 }
 
 export function closePoliceModal() {

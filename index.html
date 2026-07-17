@@ -301,6 +301,15 @@
                 </div>
             </div>
 
+            <!-- NYTT: Resultat-popup när någon blir gripen (ersätter tidigare toast) -->
+            <div class="overlay" id="arrest-result-overlay">
+                <div class="popup" style="border-color:#e53e3e;">
+                    <div class="popup-title" style="color:#e53e3e;" id="arrest-result-title" data-key="arrestResultTitle">🚨 Haffad!</div>
+                    <div class="popup-desc" id="arrest-result-message"></div>
+                    <button class="popup-btn" onclick="window.NoirUI.closeArrestResultPopup()" data-key="btnOk">Uppfattat</button>
+                </div>
+            </div>
+
             <!-- Betalning -->
             <div class="overlay" id="pay-overlay">
                 <div class="popup" style="border-color:#ecc94b;">
