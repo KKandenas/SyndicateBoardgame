@@ -856,7 +856,7 @@ function buildRulesHtml(lang) {
         <ul>
             <li><strong>HELA</strong> offrets fickinnehåll — oavsett belopp — går rakt in i din egen ficka.</li>
             <li>Bar offret på en skattkista förlorar de den helt. Den försvinner spårlöst, går varken till staden eller någon annan spelare.</li>
-            <li>Offrets riktning återställs till "på väg till Kung", och fickan laddas om till $20.</li>
+            <li>Offrets pjäs ställs tillbaka vid sitt eget Ess (riktningen återställs till "på väg till Kung"), och fickan laddas om till $20.</li>
         </ul>
 
         <h2>Händelsekort 🎴</h2>
@@ -929,7 +929,7 @@ function buildRulesHtml(lang) {
         <ul>
             <li><strong>ALL</strong> of the victim's pocket cash — whatever the amount — goes straight into your own pocket.</li>
             <li>If the victim was carrying a shipment, they lose it completely. It vanishes without a trace — it doesn't go to the city or any other player.</li>
-            <li>The victim's direction resets to "heading to King", and their pocket is refilled to $20.</li>
+            <li>The victim's token is placed back at their own Ace (direction resets to "heading to King"), and their pocket is refilled to $20.</li>
         </ul>
 
         <h2>Event Cards 🎴</h2>
