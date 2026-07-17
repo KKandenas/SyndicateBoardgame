@@ -184,13 +184,49 @@
 
         </div>
 
-        <!-- NYTT: Högerkolumn — tärning/turhantering. Händelsekortens
-             popup (#event-overlay, se modaler längre ner i filen)
-             förankras visuellt till detta hörn via CSS för iPad,
-             istället för att täcka hela skärmen i mitten som på
-             iPhone. Ingen extra markup behövs för det. På iPhone gör
-             #right-column ingenting (display:contents); center-console
-             hamnar överst som förut via order:-1. -->
+        <!-- NYTT: Scoreboard (endast iPad) — nedre vänstra rutan.
+             Kompakt ledarställning för alla spelare: riktning, ficka,
+             säkrat (kista). Uppdateras av ui.js parallellt med
+             spelarkorten i #player-column. Döljs helt på iPhone. -->
+        <div id="scoreboard-cell">
+            <div id="scoreboard">
+                <div class="scoreboard-row scoreboard-header">
+                    <span data-key="sbGang">Gäng</span>
+                    <span data-key="sbDirection">Riktning</span>
+                    <span data-key="sbPocket">Fickan</span>
+                    <span data-key="sbVault">Säkrat</span>
+                </div>
+                <div class="scoreboard-row" id="sb-p1" style="--gang-color: var(--spades-color)">
+                    <span class="scoreboard-gang" id="sb-p1-gang">♠ Nightspades</span>
+                    <span class="scoreboard-direction" id="sb-p1-direction"></span>
+                    <span class="scoreboard-value" id="sb-p1-pocket">$20</span>
+                    <span class="scoreboard-value" id="sb-p1-vault">$0</span>
+                </div>
+                <div class="scoreboard-row" id="sb-p4" style="--gang-color: var(--diamonds-color)">
+                    <span class="scoreboard-gang" id="sb-p4-gang">♦ Diamond</span>
+                    <span class="scoreboard-direction" id="sb-p4-direction"></span>
+                    <span class="scoreboard-value" id="sb-p4-pocket">$20</span>
+                    <span class="scoreboard-value" id="sb-p4-vault">$0</span>
+                </div>
+                <div class="scoreboard-row" id="sb-p2" style="--gang-color: var(--hearts-color)">
+                    <span class="scoreboard-gang" id="sb-p2-gang">♥ Crimson</span>
+                    <span class="scoreboard-direction" id="sb-p2-direction"></span>
+                    <span class="scoreboard-value" id="sb-p2-pocket">$20</span>
+                    <span class="scoreboard-value" id="sb-p2-vault">$0</span>
+                </div>
+                <div class="scoreboard-row" id="sb-p3" style="--gang-color: var(--clovers-color)">
+                    <span class="scoreboard-gang" id="sb-p3-gang">♣ Iron Clovers</span>
+                    <span class="scoreboard-direction" id="sb-p3-direction"></span>
+                    <span class="scoreboard-value" id="sb-p3-pocket">$20</span>
+                    <span class="scoreboard-value" id="sb-p3-vault">$0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- NYTT: Högerkolumn — tärning/turhantering (övre högra rutan
+             på iPad). På iPhone gör #right-column ingenting
+             (display:contents); center-console hamnar överst som förut
+             via order:-1. -->
         <div id="right-column">
 
             <!-- Mittkonsol / Tärning -->
@@ -208,10 +244,131 @@
                     <!-- Dessa tre finns nu även i #top-bar för iPad — döljs där
                          via CSS (.legacy-utility-row) så de inte syns dubbelt.
                          På iPhone är detta fortfarande enda platsen de visas. -->
-                    <div class="legacy-utility-row" style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+                    <div class="legacy-utility-row">
                         <button onclick="window.NoirUI.openRulesModal()" style="font-size:11px; padding:6px 12px; background:rgba(0,0,0,0.6);" data-key="btnRules">📜 Regler</button>
                         <button onclick="window.NoirUI.openAdjustModal()" style="font-size:11px; padding:6px 12px; background:rgba(0,0,0,0.6); color:#666;" data-key="btnAdjust">🛠️ Justera</button>
                         <button onclick="window.NoirUI.resetGame()" style="font-size:11px; padding:6px 12px; background:rgba(0,0,0,0.6); color:#666;" data-key="btnReset">Återställ</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- NYTT: Popup-hörnet (nedre högra rutan på iPad). Alla
+             spelrelaterade popup-fönster (händelsekort, polisval,
+             betalning, arrestering, slagsmål m.fl.) förankras hit via
+             CSS istället för att täcka hela skärmen, så resten av
+             brädet syns bakom. På iPhone gör #popup-cell ingenting
+             (display:contents) — där täcker de hela skärmen som förut. -->
+        <div id="popup-cell">
+
+            <!-- Händelsekort -->
+            <div class="overlay" id="event-overlay">
+                <div class="popup">
+                    <div class="popup-dice-badge" id="event-dice-badge"></div>
+                    <div class="order-notice" data-key="eventNotice">⚠️ Utför händelsen först — flytta pjäsen sen!</div>
+                    <div class="popup-title" id="event-title"></div>
+                    <div class="popup-desc" id="event-desc"></div>
+                    <button class="popup-btn" onclick="window.NoirUI.closeEventPopup()" data-key="btnOk">Uppfattat</button>
+                </div>
+            </div>
+
+            <!-- NYTT v2: Polisval vid tärning 5/6 -->
+            <div class="overlay" id="cop-choice-overlay">
+                <div class="popup" style="border-color:#ecc94b;">
+                    <div class="popup-title" style="color:#ecc94b;" id="cop-choice-title"></div>
+                    <div class="popup-desc" id="cop-choice-desc"></div>
+                    <div class="police-selector-grid" id="cop-choice-options"></div>
+                </div>
+            </div>
+
+            <!-- NYTT v2: Landade knekten på en motståndare? -->
+            <div class="overlay" id="cop-landed-overlay">
+                <div class="popup" style="border-color:#e53e3e;">
+                    <div class="popup-title" style="color:#e53e3e;" data-key="copLandedTitle">Landade din knekt på en motståndare?</div>
+                    <div class="popup-desc" data-key="copLandedDesc">Om din polis landade på en motståndares pjäs blir denne haffad direkt.</div>
+                    <button class="popup-btn" id="cop-landed-yes-btn" data-key="copLandedYes" style="background:#9c2b2b;">Ja, haffa spelaren</button>
+                    <button class="popup-btn" id="cop-landed-no-btn" data-key="copLandedNo" style="background:#1a1a1a; margin-top:8px;">Nej, gå vidare</button>
+                </div>
+            </div>
+
+            <!-- NYTT v2: Blockerande popup när en spelares ficka töms av någon anledning -->
+            <div class="overlay" id="bankrupt-overlay">
+                <div class="popup" style="border-color:#e53e3e;">
+                    <div class="popup-title" style="color:#e53e3e;" data-key="bankruptTitle">💸 Fickan är tom!</div>
+                    <div class="popup-desc" id="bankrupt-message"></div>
+                    <button class="popup-btn" onclick="window.NoirUI.closeBankruptPopup()" data-key="btnOk">Uppfattat</button>
+                </div>
+            </div>
+
+            <!-- Betalning -->
+            <div class="overlay" id="pay-overlay">
+                <div class="popup" style="border-color:#ecc94b;">
+                    <div class="popup-title" style="color:#ecc94b;" id="pay-title" data-key="payHeader">Skicka pengar</div>
+
+                    <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px; text-align:left;" data-key="payRecipient">Mottagare</label>
+                    <div class="police-selector-grid" id="pay-target-grid" style="margin-top:0; margin-bottom:16px;"></div>
+
+                    <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px; text-align:left;" data-key="payQuickAmount">Snabbval belopp</label>
+                    <div id="pay-crisis-notice" class="order-notice" style="display:none; margin-bottom:8px;"></div>
+                    <div id="pay-amount-quick" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px;"></div>
+
+                    <div class="pay-grid" style="grid-template-columns: 1fr; gap: 8px;">
+                        <div>
+                            <label for="pay-amount" data-key="paySum">Annat belopp ($)</label>
+                            <input type="number" id="pay-amount" value="10" min="1">
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button onclick="window.NoirUI.executePaymentFromModal()" class="btn-success" style="padding:10px; width:50%;" data-key="btnConfirm">Bekräfta</button>
+                        <button onclick="window.NoirUI.closePayModal()" style="background:#1a1a1a; padding:10px; width:50%;" data-key="btnCancel">Avbryt</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Arrestering (används för både manuellt "Haffad" och knektflytt-flödet) -->
+            <div class="overlay" id="police-overlay">
+                <div class="popup" style="border-color:#e53e3e;">
+                    <div class="popup-title" style="color:#e53e3e;" id="police-title" data-key="policeTitle">Vem blev gripen?</div>
+                    <p style="font-size:13px; color:#a0aec0; margin-bottom:10px;" id="police-subtitle" data-key="policeSubtitle">Fickpengarna tillfaller din egen ficka.</p>
+                    <div class="police-selector-grid" id="police-targets"></div>
+                    <button onclick="window.NoirUI.closePoliceModal()" style="background:#1a1a1a; padding:10px; width:100%; margin-top:10px;" data-key="btnCancel">Avbryt</button>
+                </div>
+            </div>
+
+            <!-- Slagsmål -->
+            <div class="overlay" id="fight-overlay">
+                <div class="popup" style="border-color:#ff7849;">
+                    <div class="popup-title" style="color:#ff7849;" data-key="fightTitle">Gatuslagsmål!</div>
+                    <div id="fight-setup-view">
+                        <p style="font-size:13px; color:#a0aec0; margin-bottom:15px;" data-key="fightPrompt">Välj vilken motståndare som står på rutan och ska attackeras:</p>
+                        <div class="police-selector-grid" id="fight-targets"></div>
+                        <button onclick="window.NoirUI.closeFightModal()" style="background:#1a1a1a; padding:10px; width:100%; margin-top:12px;" data-key="btnCancel">Avbryt</button>
+                    </div>
+                    <div id="fight-rolling-view" style="display:none;">
+                        <div class="fight-dice-container">
+                            <div class="fight-dice-box">
+                                <div class="fight-dice-name" id="fight-attacker-name">Anfallare</div>
+                                <div class="fight-dice-value" id="fight-attacker-dice">-</div>
+                            </div>
+                            <div class="fight-dice-box">
+                                <div class="fight-dice-name" id="fight-defender-name">Försvarare</div>
+                                <div class="fight-dice-value" id="fight-defender-dice">-</div>
+                            </div>
+                        </div>
+                        <div class="order-notice" id="fight-status-label" style="margin-bottom:0;">RULLAR KNOGJÄRNEN...</div>
+                        <button class="popup-btn" id="fight-close-btn" onclick="window.NoirUI.closeFightModal()" style="display:none;">Avsluta duell</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NYTT v2: Bekräftelsedialog (ersätter window.confirm/alert) -->
+            <div class="overlay" id="confirm-overlay">
+                <div class="popup">
+                    <div class="popup-desc" id="confirm-message" style="margin-bottom:20px;"></div>
+                    <div style="display:flex; gap:10px;">
+                        <button id="confirm-yes-btn" class="btn-danger" style="padding:10px; width:50%;" data-key="btnConfirm">Bekräfta</button>
+                        <button onclick="document.getElementById('confirm-overlay').classList.remove('active')" style="background:#1a1a1a; padding:10px; width:50%;" data-key="btnCancel">Avbryt</button>
                     </div>
                 </div>
             </div>
@@ -225,106 +382,6 @@
         <button class="tab-btn" data-tab="2" onclick="window.NoirUI.switchTab(2)"><span>♥</span><span data-key="suitHearts">Hjärter</span></button>
         <button class="tab-btn" data-tab="3" onclick="window.NoirUI.switchTab(3)"><span>♣</span><span data-key="suitClovers">Klöver</span></button>
         <button class="tab-btn" data-tab="4" onclick="window.NoirUI.switchTab(4)"><span>♦</span><span data-key="suitDiamonds">Ruter</span></button>
-    </div>
-
-    <!-- Händelsekort -->
-    <div class="overlay" id="event-overlay">
-        <div class="popup">
-            <div class="popup-dice-badge" id="event-dice-badge"></div>
-            <div class="order-notice" data-key="eventNotice">⚠️ Utför händelsen först — flytta pjäsen sen!</div>
-            <div class="popup-title" id="event-title"></div>
-            <div class="popup-desc" id="event-desc"></div>
-            <button class="popup-btn" onclick="window.NoirUI.closeEventPopup()" data-key="btnOk">Uppfattat</button>
-        </div>
-    </div>
-
-    <!-- NYTT v2: Polisval vid tärning 5/6 -->
-    <div class="overlay" id="cop-choice-overlay">
-        <div class="popup" style="border-color:#ecc94b;">
-            <div class="popup-title" style="color:#ecc94b;" id="cop-choice-title"></div>
-            <div class="popup-desc" id="cop-choice-desc"></div>
-            <div class="police-selector-grid" id="cop-choice-options"></div>
-        </div>
-    </div>
-
-    <!-- NYTT v2: Landade knekten på en motståndare? -->
-    <div class="overlay" id="cop-landed-overlay">
-        <div class="popup" style="border-color:#e53e3e;">
-            <div class="popup-title" style="color:#e53e3e;" data-key="copLandedTitle">Landade din knekt på en motståndare?</div>
-            <div class="popup-desc" data-key="copLandedDesc">Om din polis landade på en motståndares pjäs blir denne haffad direkt.</div>
-            <button class="popup-btn" id="cop-landed-yes-btn" data-key="copLandedYes" style="background:#9c2b2b;">Ja, haffa spelaren</button>
-            <button class="popup-btn" id="cop-landed-no-btn" data-key="copLandedNo" style="background:#1a1a1a; margin-top:8px;">Nej, gå vidare</button>
-        </div>
-    </div>
-
-    <!-- NYTT v2: Blockerande popup när en spelares ficka töms av någon anledning -->
-    <div class="overlay" id="bankrupt-overlay">
-        <div class="popup" style="border-color:#e53e3e;">
-            <div class="popup-title" style="color:#e53e3e;" data-key="bankruptTitle">💸 Fickan är tom!</div>
-            <div class="popup-desc" id="bankrupt-message"></div>
-            <button class="popup-btn" onclick="window.NoirUI.closeBankruptPopup()" data-key="btnOk">Uppfattat</button>
-        </div>
-    </div>
-
-    <!-- Betalning -->
-    <div class="overlay" id="pay-overlay">
-        <div class="popup" style="border-color:#ecc94b;">
-            <div class="popup-title" style="color:#ecc94b;" id="pay-title" data-key="payHeader">Skicka pengar</div>
-
-            <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px; text-align:left;" data-key="payRecipient">Mottagare</label>
-            <div class="police-selector-grid" id="pay-target-grid" style="margin-top:0; margin-bottom:16px;"></div>
-
-            <label style="display:block; font-size:11px; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px; text-align:left;" data-key="payQuickAmount">Snabbval belopp</label>
-            <div id="pay-crisis-notice" class="order-notice" style="display:none; margin-bottom:8px;"></div>
-            <div id="pay-amount-quick" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px;"></div>
-
-            <div class="pay-grid" style="grid-template-columns: 1fr; gap: 8px;">
-                <div>
-                    <label for="pay-amount" data-key="paySum">Annat belopp ($)</label>
-                    <input type="number" id="pay-amount" value="10" min="1">
-                </div>
-            </div>
-            <div style="display:flex; gap:10px;">
-                <button onclick="window.NoirUI.executePaymentFromModal()" class="btn-success" style="padding:10px; width:50%;" data-key="btnConfirm">Bekräfta</button>
-                <button onclick="window.NoirUI.closePayModal()" style="background:#1a1a1a; padding:10px; width:50%;" data-key="btnCancel">Avbryt</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Arrestering (används för både manuellt "Haffad" och knektflytt-flödet) -->
-    <div class="overlay" id="police-overlay">
-        <div class="popup" style="border-color:#e53e3e;">
-            <div class="popup-title" style="color:#e53e3e;" id="police-title" data-key="policeTitle">Vem blev gripen?</div>
-            <p style="font-size:13px; color:#a0aec0; margin-bottom:10px;" id="police-subtitle" data-key="policeSubtitle">Fickpengarna tillfaller din egen ficka.</p>
-            <div class="police-selector-grid" id="police-targets"></div>
-            <button onclick="window.NoirUI.closePoliceModal()" style="background:#1a1a1a; padding:10px; width:100%; margin-top:10px;" data-key="btnCancel">Avbryt</button>
-        </div>
-    </div>
-
-    <!-- Slagsmål -->
-    <div class="overlay" id="fight-overlay">
-        <div class="popup" style="border-color:#ff7849;">
-            <div class="popup-title" style="color:#ff7849;" data-key="fightTitle">Gatuslagsmål!</div>
-            <div id="fight-setup-view">
-                <p style="font-size:13px; color:#a0aec0; margin-bottom:15px;" data-key="fightPrompt">Välj vilken motståndare som står på rutan och ska attackeras:</p>
-                <div class="police-selector-grid" id="fight-targets"></div>
-                <button onclick="window.NoirUI.closeFightModal()" style="background:#1a1a1a; padding:10px; width:100%; margin-top:12px;" data-key="btnCancel">Avbryt</button>
-            </div>
-            <div id="fight-rolling-view" style="display:none;">
-                <div class="fight-dice-container">
-                    <div class="fight-dice-box">
-                        <div class="fight-dice-name" id="fight-attacker-name">Anfallare</div>
-                        <div class="fight-dice-value" id="fight-attacker-dice">-</div>
-                    </div>
-                    <div class="fight-dice-box">
-                        <div class="fight-dice-name" id="fight-defender-name">Försvarare</div>
-                        <div class="fight-dice-value" id="fight-defender-dice">-</div>
-                    </div>
-                </div>
-                <div class="order-notice" id="fight-status-label" style="margin-bottom:0;">RULLAR KNOGJÄRNEN...</div>
-                <button class="popup-btn" id="fight-close-btn" onclick="window.NoirUI.closeFightModal()" style="display:none;">Avsluta duell</button>
-            </div>
-        </div>
     </div>
 
     <!-- Justera (admin) -->
@@ -363,17 +420,6 @@
     <!-- Regler -->
     <div class="overlay" id="rules-overlay">
         <div class="popup popup-large" id="rules-content-area"></div>
-    </div>
-
-    <!-- NYTT v2: Bekräftelsedialog (ersätter window.confirm/alert) -->
-    <div class="overlay" id="confirm-overlay">
-        <div class="popup">
-            <div class="popup-desc" id="confirm-message" style="margin-bottom:20px;"></div>
-            <div style="display:flex; gap:10px;">
-                <button id="confirm-yes-btn" class="btn-danger" style="padding:10px; width:50%;" data-key="btnConfirm">Bekräfta</button>
-                <button onclick="document.getElementById('confirm-overlay').classList.remove('active')" style="background:#1a1a1a; padding:10px; width:50%;" data-key="btnCancel">Avbryt</button>
-            </div>
-        </div>
     </div>
 
     <!-- NYTT v2: Vinst-overlay -->

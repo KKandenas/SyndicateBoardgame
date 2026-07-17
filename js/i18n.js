@@ -37,6 +37,12 @@ export const i18n = {
         statVault: "🔒 Kista (Säkrat)",
         statCityBank: "🏛️ Stadens kassa",
 
+        // --- Scoreboard (NYTT) ---
+        sbGang: "Gäng",
+        sbDirection: "Riktning",
+        sbPocket: "💼 Fickan",
+        sbVault: "🔒 Säkrat",
+
         // --- Riktning (NYTT) ---
         directionToKing: "🚚 På väg till Kung",
         directionToAce: "🏦 På väg till Ess (bär last)",
@@ -163,6 +169,11 @@ export const i18n = {
         statPocket: "💼 Pocket",
         statVault: "🔒 Vault (Secured)",
         statCityBank: "🏛️ City Treasury",
+
+        sbGang: "Gang",
+        sbDirection: "Direction",
+        sbPocket: "💼 Pocket",
+        sbVault: "🔒 Secured",
 
         directionToKing: "🚚 Heading to King",
         directionToAce: "🏦 Heading to Ace (carrying cargo)",
