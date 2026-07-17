@@ -19,8 +19,8 @@
 // förifyllt med den aktiva spelaren i fall (b).
 //
 // Appen flyttar inte fysiska pjäser. Regeln "offrets pjäs skickas
-// tillbaka till sin Kung" är oförändrad men utförs av spelarna
-// vid bordet.
+// tillbaka till sitt Ess" (riktningen återställs till TO_KING, precis
+// som vid spelstart) är oförändrad men utförs av spelarna vid bordet.
 // ============================================================
 
 import { getPlayer, mutatePlayer, START_POCKET, DIRECTION } from './state.js';
