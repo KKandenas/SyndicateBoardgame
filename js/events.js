@@ -47,7 +47,7 @@ export const eventPool = {
         {
             id: 'shortcut',
             title: "🏃 Genväg i gränden",
-            desc: "Du hittar en olåst dörr. Du får dispens att flytta diagonalt under just detta drag om du vill."
+            desc: "Du hittar en olåst dörr. Gå 3 steg med din droska, och du får flytta diagonalt om du vill."
         },
         {
             id: 'pickpocket',
@@ -79,7 +79,7 @@ export const eventPool = {
         {
             id: 'shortcut',
             title: "🏃 Alleyway Shortcut",
-            desc: "You find an unlocked fire escape. You are permitted to move diagonally during this turn only."
+            desc: "You find an unlocked fire escape. Move 3 steps with your car, and you may move diagonally if you wish."
         },
         {
             id: 'pickpocket',
